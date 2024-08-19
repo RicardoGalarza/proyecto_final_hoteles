@@ -1,0 +1,12 @@
+// archivo: src/styles/_custom.scss
+$primary: #783200;
+$secondary: #010000;
+$success: #010000;
+$info: #ffd570; // Puedes cambiarlo si tienes un color diferente para info
+$warning: #ffd570; // Puedes cambiarlo si tienes un color diferente para warning
+$danger: #783200; // Puedes cambiarlo si tienes un color diferente para danger
+$light: #ffd570; // Puedes cambiarlo si tienes un color diferente para light
+$dark: #010000; // Puedes cambiarlo si tienes un color diferente para dark
+
+// Importa Bootstrap después de tus personalizaciones
+@import '~bootstrap/scss/bootstrap';
