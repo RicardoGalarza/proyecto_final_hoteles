@@ -1,4 +1,4 @@
-// src/components/CrearCuentaCliente.js
+import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,12 +8,22 @@ const CrearCuentaCliente = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
-        // Aquí puedes agregar la lógica para registrar al cliente
-        console.log({ username, email, password });
-        // Después de registrar al cliente, redirige a la página de inicio de sesión
-        navigate('/logincliente');
+
+        try {
+            const response = await axios.post('http://localhost:8080/cuentas', {
+                usuario: username,
+                correo: email,
+                clave: password
+            });
+
+            console.log('Cuenta creada:', response.data);
+            navigate('/login');
+        } catch (error) {
+            console.error('Error al crear la cuenta:', error);
+            alert('Hubo un error al crear la cuenta');
+        }
     };
 
     return (
