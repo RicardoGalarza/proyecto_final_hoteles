@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,12 +9,17 @@ import jakarta.persistence.Id;
 @Entity
 public class Cuenta {
     
-    @Id
+     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(nullable = false, unique = true)
     private String usuario;
+
+    @Column(nullable = false, unique = true)  // Hacer que el correo sea único
     private String correo;
+
+    @Column(nullable = false)
     private String clave;
 
     // Getters y Setters

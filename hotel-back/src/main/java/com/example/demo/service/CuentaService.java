@@ -24,6 +24,14 @@ public class CuentaService {
     }
 
     public Cuenta saveCuenta(Cuenta cuenta) {
+        Optional<Cuenta> existingCuentaByUsuario = cuentaRepository.findByUsuario(cuenta.getUsuario());
+        if (existingCuentaByUsuario.isPresent()) {
+            throw new RuntimeException("El nombre de usuario ya está en uso.");
+        }
+        Optional<Cuenta> existingCuentaByCorreo = cuentaRepository.findByCorreo(cuenta.getCorreo());
+        if (existingCuentaByCorreo.isPresent()) {
+            throw new RuntimeException("El correo electrónico ya está en uso.");
+        }
         return cuentaRepository.save(cuenta);
     }
 
