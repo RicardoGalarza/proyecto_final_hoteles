@@ -36,55 +36,53 @@ const Home = () => {
 
   ];
   return (
-    <div className="container mt-5 pt-5">
-      <h2 className="mb-4">Busca ofertas de hoteles</h2>
-      <form onSubmit={handleSubmit} className="d-flex align-items-center">
-        <input
-          type="text"
-          className="form-control me-2"
-          name="destino"
-          placeholder="¿A dónde vamos?"
-          value={formData.destino}
-          onChange={handleChange}
-        />
-        <input
-          type="date"
-          className="form-control me-2"
-          name="fechaInicio"
-          value={formData.fechaInicio}
-          onChange={handleChange}
-        />
-        <input
-          type="date"
-          className="form-control me-2"
-          name="fechaFin"
-          value={formData.fechaFin}
-          onChange={handleChange}
-        />
-        <button type="submit" className="btn btn-primary">Buscar</button>
-      </form>
-
-
-      <div className="container mt-4">
-        <h2>Habitaciones Disponibles</h2>
+    
+      <div className="container mt-5 pt-5">
+        {/* Sección de Habitaciones Disponibles */}
+        <h2 className="mb-4">Habitaciones Disponibles</h2>
         <div className="row">
-          {rooms.map(room => (
-            <div className="col-6 col-md-6 col-lg-6 col-xs-6 mb-4" key={room.id}>
+          {rooms.map((room) => (
+            <div className="col-6 col-md-6 col-lg-6 mb-4" key={room.id}>
               <div className="card">
                 <div className="card-body">
                   <h5 className="card-title">{room.name}</h5>
                   <p className="card-text">{room.description}</p>
                   <p className="card-text">{room.price}</p>
-                  <Link to={`/verdetalles/${room.id}`} className="btn btn-primary">Ver Detalles</Link>
+                  <Link to={`/verdetalles/${room.id}`} className="btn btn-primary">
+                    Ver Detalles
+                  </Link>
                 </div>
               </div>
             </div>
           ))}
         </div>
+  
+        {/* Sección de Habitaciones Recomendadas */}
+        <div className="mt-4">
+          <h2 className="mb-4">Habitaciones Recomendadas</h2>
+          <div className="row">
+            {rooms.map((room) => (
+              <div className="col-lg-4 col-md-6 mb-4" key={room.id}>
+                <div className="card shadow-sm">
+                  <img src={room.imageUrl} className="card-img-top" alt={room.name} />
+                  <div className="card-body">
+                    <h5 className="card-title">{room.name}</h5>
+                    <p className="card-text">{room.description}</p>
+                    <p className="card-text">
+                      <strong>${room.price}</strong> por noche
+                    </p>
+                    <Link to={`/verdetalles/${room.id}`} className="btn btn-primary">
+                      Ver Detalles
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    );
 
-  );
 };
 
 export default Home;
