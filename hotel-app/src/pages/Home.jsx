@@ -36,8 +36,8 @@ const Home = () => {
 
   ];
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4">Busca ofertas en hoteles, casas y mucho más</h2>
+    <div className="container mt-5 pt-5">
+      <h2 className="mb-4">Busca ofertas de hoteles</h2>
       <form onSubmit={handleSubmit} className="d-flex align-items-center">
         <input
           type="text"
@@ -69,8 +69,8 @@ const Home = () => {
         <h2>Habitaciones Disponibles</h2>
         <div className="row">
           {rooms.map(room => (
-            <div className="col-md-6 mb-4" key={room.id}>
-              <div className="card h-100">
+            <div className="col-6 col-md-6 col-lg-6 col-xs-6 mb-4" key={room.id}>
+              <div className="card">
                 <div className="card-body">
                   <h5 className="card-title">{room.name}</h5>
                   <p className="card-text">{room.description}</p>

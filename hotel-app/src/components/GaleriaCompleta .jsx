@@ -8,7 +8,7 @@ const GaleriaCompleta = ({ imagenes }) => {
     const habitacion = imagenes.find(habitacion => habitacion.id === parseInt(id, 10));
 
     if (!habitacion || !habitacion.images || habitacion.images.length === 0) {
-        return <div>Habitación no encontrada o sin imágenes</div>;
+        return <div>Habitación no encontrada o sin imágenes.</div>;
     }
 
     const handleVolver = () => {
@@ -16,7 +16,7 @@ const GaleriaCompleta = ({ imagenes }) => {
     };
 
     return (
-        <div className="container mt-4">
+        <div className="container mt-5 pt-5"> {/* Agrega mt-5 pt-5 para dejar espacio suficiente */}
             <h2>Galería Completa</h2>
             <div className="row mb-3">
                 {habitacion.images.map((image, index) => (

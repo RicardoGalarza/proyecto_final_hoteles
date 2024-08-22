@@ -14,7 +14,7 @@ const VerDetalles = ({ imagenes }) => {
     const imagenesSecundarias = habitacion.images.slice(1, 5); // Asumiendo que solo se muestran 4 imágenes secundarias
 
     return (
-        <div className="container mt-4">
+        <div className="container pt-5 mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2>{habitacion.name}</h2>
                 <Link to="/" className="btn btn-outline-primary">
