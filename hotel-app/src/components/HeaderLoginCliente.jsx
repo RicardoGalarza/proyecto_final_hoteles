@@ -37,7 +37,7 @@ const HeaderLoginCliente = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link to="/" className="btn btn-secondary">
+                <Link to="/" className="btn btn-primary me-2">
                   Inicio
                 </Link>
               </li>
