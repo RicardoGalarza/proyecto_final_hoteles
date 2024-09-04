@@ -1,47 +1,60 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom'; // Importamos useNavigate para la redirección
 
-const VerDetalles = ({ imagenes }) => {
-    const { id } = useParams();
-    const habitacion = imagenes.find(habitacion => habitacion.id === parseInt(id, 10));
+const VerDetalles = () => {
+    const { id } = useParams(); // Obtiene el id de la habitación de la URL
+    const [habitacion, setHabitacion] = useState(null);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate(); // Hook para redirigir
 
-    if (!habitacion) {
-        return <div>Habitación no encontrada</div>;
+    useEffect(() => {
+        const fetchHabitacion = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/habitaciones/${id}`);
+                setHabitacion(response.data);
+            } catch (err) {
+                console.error('Hubo un error al obtener los detalles de la habitación', err);
+                setError('Hubo un problema al cargar los detalles. Por favor, intenta más tarde.');
+            }
+        };
+
+        fetchHabitacion();
+    }, [id]);
+
+    if (error) {
+        return <div className="alert alert-danger">{error}</div>;
     }
 
-    const imagenPrincipal = habitacion.images[0];
-    const imagenesSecundarias = habitacion.images.slice(1, 5); // Asumiendo que solo se muestran 4 imágenes secundarias
+    if (!habitacion) {
+        return <div>Cargando detalles...</div>;
+    }
 
     return (
-        <div className="container pt-5 mt-4">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>{habitacion.name}</h2>
-                <Link to="/" className="btn btn-outline-primary">
-                    <i className="fas fa-arrow-left"></i> Volver
-                </Link>
-            </div>
+        <div className="container py-5">
+            <h2 className="text-center mb-4">{habitacion.nombre}</h2>
             <div className="row">
-                <div className="col-md-6 mb-4">
-                    <img src={imagenPrincipal} alt="Imagen Principal" className="img-fluid" />
-                </div>
-                <div className="col-md-6">
-                    <div className="row">
-                        {imagenesSecundarias.map((imagen, index) => (
-                            <div className="col-6 mb-3" key={index}>
-                                <img src={imagen} alt={`Imagen ${index + 2}`} className="img-fluid" />
-                            </div>
-                        ))}
+                {habitacion.imagenes.map((imagen) => (
+                    <div className="col-md-4 mb-4" key={imagen.id}>
+                        <img
+                            src={`http://localhost:8080/${habitacion.id}/${imagen.nombre}`}
+                            alt={habitacion.nombre}
+                            className="img-fluid"
+                        />
                     </div>
-                    <div className="text-end mt-2">
-                        <Link to={`/galeria/${habitacion.id}`} className="btn btn-outline-primary">
-                            Ver más
-                        </Link>
-                    </div>
-                </div>
+                ))}
             </div>
-            <p className="lead mt-4">{habitacion.description}</p>
-            <h4 className="text-primary">{habitacion.price}</h4>
+            <div className="text-center">
+                <p>{habitacion.descripcion}</p>
+                <p>Precio: {habitacion.precio}</p>
+                {/* Botón Ver más que redirige a la galería completa */}
+                <button
+                    className="btn btn-primary"
+                    onClick={() => navigate(`/galeria-completa/${habitacion.id}`)}
+                >
+                    Ver más
+                </button>
+            </div>
         </div>
     );
 };

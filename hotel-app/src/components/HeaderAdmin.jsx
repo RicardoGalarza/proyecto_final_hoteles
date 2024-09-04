@@ -9,7 +9,7 @@ const HeaderAdmin = () => (
       <nav>
         <Link to="/admin/crearhabitacion" className="btn btn-outline-light me-2">Crear Habitaciones</Link>
         <Link to="/admin/verhabitacion" className="btn btn-outline-light me-2">Ver Habitaciones</Link>
-        <Link to="/logout" className="btn btn-outline-light">Salir</Link>
+        <Link to="/" className="btn btn-outline-light">Salir</Link>
       </nav>
     </div>
   </header>
