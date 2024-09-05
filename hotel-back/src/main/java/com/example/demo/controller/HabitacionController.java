@@ -27,7 +27,7 @@ import com.example.demo.model.Habitacion;
 import com.example.demo.model.Imagen;
 import com.example.demo.service.HabitacionService;
 import com.example.demo.service.ImagenService;
-
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/habitaciones")
 public class HabitacionController {
@@ -48,7 +48,7 @@ public class HabitacionController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
-    @CrossOrigin(origins = "http://localhost:3000")
+   
     public ResponseEntity<Habitacion> createHabitacion(
             @RequestParam("nombre") String nombre,
             @RequestParam("descripcion") String descripcion,
@@ -79,14 +79,14 @@ public class HabitacionController {
         for (MultipartFile imagen : imagenes) {
             try {
                 // Generar la ruta completa donde se guardará la imagen
-                Path filePath = Paths.get(uploadDirectory + imagen.getOriginalFilename());
+                Path filePath = Paths.get(uploadDirectory + imagen.getOriginalFilename().replace(" ", ""));
 
                 // Guardar la imagen en el directorio
                 Files.write(filePath, imagen.getBytes());
 
                 // Guardar la imagen en la base de datos con el ID de la habitación
                 Imagen nuevaImagen = new Imagen();
-                nuevaImagen.setNombre(imagen.getOriginalFilename());
+                nuevaImagen.setNombre(imagen.getOriginalFilename().replace(" ", ""));
                 nuevaImagen.setHabitacion(savedHabitacion);
                 imagenService.saveImagen(nuevaImagen);  // Guarda la imagen con ImagenService
 
