@@ -7,7 +7,6 @@ import CrearCuentaCliente from './components/CrearCuentaCliente';
 import FooterAdmin from './components/FooterAdmin';
 import FooterCliente from './components/FooterCliente';
 import GaleriaCompleta from './components/GaleriaCompleta ';
-import GaleriaImagenes from './components/GaleriaImagenes ';
 import HeaderAdmin from './components/HeaderAdmin';
 import HeaderCliente from './components/HeaderCliente';
 import HeaderLoginAdmin from './components/HeaderLoginAdmin';
@@ -19,123 +18,9 @@ import RegistrarHabitacion from './pages/administrador/RegistrarHabitacion';
 import ClienteLogin from './pages/cliente/ClienteLogin';
 import VerDetalles from './pages/cliente/VerDetalles';
 import Home from './pages/Home';
-
 import NotFound from './pages/NotFound';
 import './styles/_custom.scss';
 
-const imagenesEjemplo = [
-  {
-    id: 1,
-    name: 'Suite Presidencial',
-    images: [
-      'https://via.placeholder.com/600x400?text=Imagen+Principal',
-      'https://via.placeholder.com/300x300?text=Imagen+1',
-      'https://via.placeholder.com/300x300?text=Imagen+2',
-      'https://via.placeholder.com/300x300?text=Imagen+3',
-      'https://via.placeholder.com/300x300?text=Imagen+4'
-    ]
-  },
-  {
-    id: 2,
-    name: 'Suite Presidencial',
-    images: [
-      'https://via.placeholder.com/600x400?text=Imagen+Principal',
-      'https://via.placeholder.com/300x300?text=Imagen+1',
-      'https://via.placeholder.com/300x300?text=Imagen+2',
-      'https://via.placeholder.com/300x300?text=Imagen+3',
-      'https://via.placeholder.com/300x300?text=Imagen+4'
-    ]
-  },
-  {
-    id: 3,
-    name: 'Suite Presidencial',
-    images: [
-      'https://via.placeholder.com/600x400?text=Imagen+Principal',
-      'https://via.placeholder.com/300x300?text=Imagen+1',
-      'https://via.placeholder.com/300x300?text=Imagen+2',
-      'https://via.placeholder.com/300x300?text=Imagen+3',
-      'https://via.placeholder.com/300x300?text=Imagen+4'
-    ]
-  },
-  {
-    id: 4,
-    name: 'Suite Presidencial',
-    images: [
-      'https://via.placeholder.com/600x400?text=Imagen+Principal',
-      'https://via.placeholder.com/300x300?text=Imagen+1',
-      'https://via.placeholder.com/300x300?text=Imagen+2',
-      'https://via.placeholder.com/300x300?text=Imagen+3',
-      'https://via.placeholder.com/300x300?text=Imagen+4'
-    ]
-  },
-  {
-    id: 5,
-    name: 'Suite Presidencial',
-    images: [
-      'https://via.placeholder.com/600x400?text=Imagen+Principal',
-      'https://via.placeholder.com/300x300?text=Imagen+1',
-      'https://via.placeholder.com/300x300?text=Imagen+2',
-      'https://via.placeholder.com/300x300?text=Imagen+3',
-      'https://via.placeholder.com/300x300?text=Imagen+4'
-    ]
-  },
-  {
-    id: 6,
-    name: 'Suite Presidencial',
-    images: [
-      'https://via.placeholder.com/600x400?text=Imagen+Principal',
-      'https://via.placeholder.com/300x300?text=Imagen+1',
-      'https://via.placeholder.com/300x300?text=Imagen+2',
-      'https://via.placeholder.com/300x300?text=Imagen+3',
-      'https://via.placeholder.com/300x300?text=Imagen+4'
-    ]
-  },
-  {
-    id: 7,
-    name: 'Suite Presidencial',
-    images: [
-      'https://via.placeholder.com/600x400?text=Imagen+Principal',
-      'https://via.placeholder.com/300x300?text=Imagen+1',
-      'https://via.placeholder.com/300x300?text=Imagen+2',
-      'https://via.placeholder.com/300x300?text=Imagen+3',
-      'https://via.placeholder.com/300x300?text=Imagen+4'
-    ]
-  },
-  {
-    id: 8,
-    name: 'Suite Presidencial',
-    images: [
-      'https://via.placeholder.com/600x400?text=Imagen+Principal',
-      'https://via.placeholder.com/300x300?text=Imagen+1',
-      'https://via.placeholder.com/300x300?text=Imagen+2',
-      'https://via.placeholder.com/300x300?text=Imagen+3',
-      'https://via.placeholder.com/300x300?text=Imagen+4'
-    ]
-  },
-  {
-    id: 9,
-    name: 'Suite Presidencial',
-    images: [
-      'https://via.placeholder.com/600x400?text=Imagen+Principal',
-      'https://via.placeholder.com/300x300?text=Imagen+1',
-      'https://via.placeholder.com/300x300?text=Imagen+2',
-      'https://via.placeholder.com/300x300?text=Imagen+3',
-      'https://via.placeholder.com/300x300?text=Imagen+4'
-    ]
-  },
-  {
-    id: 10,
-    name: 'Suite Presidencial',
-    images: [
-      'https://via.placeholder.com/600x400?text=Imagen+Principal',
-      'https://via.placeholder.com/300x300?text=Imagen+1',
-      'https://via.placeholder.com/300x300?text=Imagen+2',
-      'https://via.placeholder.com/300x300?text=Imagen+3',
-      'https://via.placeholder.com/300x300?text=Imagen+4'
-    ]
-  },
-  
-];
 
 
 
@@ -175,10 +60,11 @@ function App() {
             <Route path="/login" element={<ClienteLogin />} />
             <Route path="/admin/crearhabitacion" element={<RegistrarHabitacion />} />
             <Route path="/admin/habitaciones" element={<Habitaciones />} />
-            <Route path="/verdetalles/:id" element={<VerDetalles imagenes={imagenesEjemplo} />} />
-            <Route path="/galeria" element={<GaleriaImagenes imagenes={imagenesEjemplo} />} />
-            <Route path="/habitaciones/:id" element={<VerDetalles />} />
+            <Route path="/verdetalles/:id" element={<VerDetalles />} />
             <Route path="/galeria-completa/:id" element={<GaleriaCompleta />} />
+            
+            
+            <Route path="/habitaciones/:id" element={<VerDetalles />} />
             <Route path="/loginadmin" element={<AdminLogin />} />
             <Route path="/crearcuentacliente" element={<CrearCuentaCliente />} />
             <Route path="/admin/verhabitacion" element={<VerHabitacion />} />
