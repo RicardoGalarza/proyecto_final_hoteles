@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const GaleriaCompleta = () => {
     const { id } = useParams();  // Captura el ID de la URL
     const [habitacion, setHabitacion] = useState(null);
     const [error, setError] = useState(null);
-
+    const navigate = useNavigate();
     useEffect(() => {
         // Lógica para obtener la habitación con todas sus imágenes
         const fetchHabitacion = async () => {
@@ -29,6 +29,10 @@ const GaleriaCompleta = () => {
         return <div>No hay imágenes para mostrar</div>;
     }
 
+    const handleVolver = () => {
+        navigate(`/habitaciones/${id}`); // Redirige a Ver Detalles
+    };
+
     return (
         <div className="container mt-5 pt-5">
             <h2 className="text-center">Galeria Completa</h2>
@@ -42,6 +46,13 @@ const GaleriaCompleta = () => {
                         />
                     </div>
                 ))}
+            </div>
+
+            {/* Botón Volver Atrás */}
+            <div className="text-end mb-5">
+                <button onClick={handleVolver} className="btn btn-primary">
+                    Volver Atrás
+                </button>
             </div>
         </div>
     );
