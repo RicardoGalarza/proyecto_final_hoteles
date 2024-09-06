@@ -30,24 +30,52 @@ const VerDetalles = () => {
 
     return (
         <div className="container py-5">
-            <h2 className="text-center mb-4">{habitacion.nombre}</h2>
-            <div className="row">
-                    <div className="col-md-4 mb-4">
-                        <img
-                            src={`http://localhost:8080/${habitacion.id}/${habitacion.imagenes[0]?.nombre}`} 
-                            alt={habitacion.nombre} 
-                            className="img-fluid"
-                        />
-                    </div>
-            </div>
-            <div className="text-center">
-                <p>{habitacion.descripcion}</p>
-                <p>Precio: {habitacion.precio}</p>
+    {/* Mostrar el nombre de la habitación */}
+    <h2 className="text-center mb-4">{habitacion.nombre}</h2>
+    <div className="row">
+      {/* Imagen grande en el lado izquierdo */}
+      <div className="col-md-6">
+        <div className="card h-100 zoom">
+          <img
+            src={`http://localhost:8080/${habitacion.id}/${habitacion.imagenes[0].nombre}`}
+            alt="Imagen principal"
+            className="img-fluid"
+            style={{ width: '100%', height: '400px', objectFit: 'cover' }}
+          />
+        </div>
+      </div>
 
-                {/* Botón para redirigir a la galería completa */}
-                <Link to={`/galeria-completa/${habitacion.id}`} className="btn btn-primary">
-                    Ver más
-                </Link>
+      {/* Cuatro imágenes en el lado derecho */}
+      <div className="col-md-6">
+        <div className="row">
+          {habitacion.imagenes.slice(1, 5).map((imagen, index) => (
+            <div className="col-md-6 mb-3" key={index}>
+              <div className="card h-100 zoom">
+                <img
+                  src={`http://localhost:8080/${habitacion.id}/${imagen.nombre}`}
+                  alt={`Imagen ${index + 2}`}
+                  className="img-fluid"
+                  style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+            <div className="text-center mt-4">
+                <p>{habitacion.descripcion}</p>
+                <p><strong>Precio:</strong> {habitacion.precio}</p>
+
+                {/* Separación entre los botones */}
+                <div className="d-flex justify-content-center mt-3">
+                    <Link to={`/galeria-completa/${habitacion.id}`} className="btn btn-primary mx-3">
+                        Ver más
+                    </Link>
+                    <Link to="/" className="btn btn-primary mx-3">
+                        Volver al inicio
+                    </Link>
+                </div>
             </div>
         </div>
     );

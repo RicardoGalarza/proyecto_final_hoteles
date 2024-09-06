@@ -34,7 +34,7 @@ const HabitacionesDisponibles = () => {
             <div className="row">
                 {habitaciones.length > 0 ? (
                     habitaciones.slice(0, 10).map((habitacion) =>  (
-                        <div className="col-md-4 mb-4" key={habitacion.id}>
+                        <div className="col-md-6 mb-4" key={habitacion.id}>
                             <div className="card h-100">
                                 {/* Ajusta la imagen para que se vea bien y esté centrada */}
                                 <img

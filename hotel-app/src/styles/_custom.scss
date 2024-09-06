@@ -10,3 +10,10 @@ $dark: #010000; // Puedes cambiarlo si tienes un color diferente para dark
 
 // Importa Bootstrap después de tus personalizaciones
 @import '~bootstrap/scss/bootstrap';
+.zoom {
+    transition: transform 0.3s ease; /* Animación suave */
+  }
+  
+  .zoom:hover {
+    transform: scale(1.05); /* Aumenta ligeramente el tamaño al pasar el mouse */
+  }

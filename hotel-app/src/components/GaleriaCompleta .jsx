@@ -35,14 +35,15 @@ const GaleriaCompleta = () => {
 
     return (
         <div className="container mt-5 pt-5">
-            <h2 className="text-center">Galeria Completa</h2>
+            <h2 className="text-center ">Galeria Completa</h2>
             <div className="row mb-3">
                 {habitacion.imagenes.map((imagen, index) => (
-                    <div className="col-md-4 mb-4" key={index}>
+                    <div className="col-md-4 mb-4 zoom" key={index}>
                         <img
                             src={`http://localhost:8080/${habitacion.id}/${imagen.nombre}`}
                             alt={`Imagen ${index + 1}`}
                             className="img-fluid"
+                            style={{ width: "100%", height: "200px", objectFit: "cover" }}
                         />
                     </div>
                 ))}
