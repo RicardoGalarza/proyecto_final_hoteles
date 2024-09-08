@@ -68,7 +68,7 @@ function App() {
             <Route path="/habitaciones/:id" element={<VerDetalles />} />
             <Route path="/crearcuentacliente" element={<CrearCuentaCliente />} />
             <Route path="/admin/verhabitacion" element={<VerHabitacion />} />
-            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/Admin" element={<AdminLogin />} />
             <Route path="/administracion" element={<Administrador />} />
             
             {/* Otras rutas */}

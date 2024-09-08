@@ -20,7 +20,7 @@ const AdminLogin = () => {
 
   return (
     <div className="container mt-5">
-      <h2>Inicio de Administrador</h2>
+      <h2>Inicio de sesión del administrador</h2>
       <form onSubmit={handleLogin}>
         <div className="mb-3">
           <label htmlFor="username" className="form-label">Usuario</label>
