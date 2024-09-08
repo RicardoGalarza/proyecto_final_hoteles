@@ -13,6 +13,7 @@ import HeaderCliente from './components/HeaderCliente';
 import HeaderLoginAdmin from './components/HeaderLoginAdmin';
 import HeaderLoginCliente from './components/HeaderLoginCliente';
 import VerHabitacion from './components/VerHabitacion';
+import Administrador from './pages/administrador/Administrador';
 import AdminLogin from './pages/administrador/AdminLogin';
 import Habitaciones from './pages/administrador/Habitaciones';
 import RegistrarHabitacion from './pages/administrador/RegistrarHabitacion';
@@ -68,6 +69,8 @@ function App() {
             <Route path="/crearcuentacliente" element={<CrearCuentaCliente />} />
             <Route path="/admin/verhabitacion" element={<VerHabitacion />} />
             <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/administracion" element={<Administrador />} />
+            
             {/* Otras rutas */}
             <Route path="*" element={<NotFound />} />
           </Routes>
