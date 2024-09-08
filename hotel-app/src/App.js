@@ -1,4 +1,5 @@
 
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import React from 'react';
@@ -18,6 +19,7 @@ import RegistrarHabitacion from './pages/administrador/RegistrarHabitacion';
 import ClienteLogin from './pages/cliente/ClienteLogin';
 import VerDetalles from './pages/cliente/VerDetalles';
 import Home from './pages/Home';
+
 import NotFound from './pages/NotFound';
 import './styles/_custom.scss';
 
@@ -62,13 +64,10 @@ function App() {
             <Route path="/admin/habitaciones" element={<Habitaciones />} />
             <Route path="/verdetalles/:id" element={<VerDetalles />} />
             <Route path="/galeria-completa/:id" element={<GaleriaCompleta />} />
-            
-            
             <Route path="/habitaciones/:id" element={<VerDetalles />} />
-            <Route path="/loginadmin" element={<AdminLogin />} />
             <Route path="/crearcuentacliente" element={<CrearCuentaCliente />} />
             <Route path="/admin/verhabitacion" element={<VerHabitacion />} />
-            
+            <Route path="/admin" element={<AdminLogin />} />
             {/* Otras rutas */}
             <Route path="*" element={<NotFound />} />
           </Routes>
