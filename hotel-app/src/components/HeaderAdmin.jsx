@@ -10,6 +10,8 @@ const HeaderAdmin = () => {
       navigate('/admin/crearhabitacion');
     } else if (eventKey === 'Ver Habitaciones') {
       navigate('/admin/verhabitacion');
+    } else if (eventKey === 'crearCategoria') {
+      navigate('/admin/crear-categoria');
     }
   };
 
@@ -27,6 +29,18 @@ const HeaderAdmin = () => {
           >
             <Dropdown.Item eventKey="Crear Habitaciones">Crear Habitaciones</Dropdown.Item>
             <Dropdown.Item eventKey="Ver Habitaciones">Ver Habitaciones</Dropdown.Item>
+          </DropdownButton>
+
+          {/* Dropdown para Crear Categorías */}
+          <DropdownButton
+            id="dropdown-categorias-button"
+            title="Categorías"  // Fijo en "Crear Categorías"
+            onSelect={handleSelect}
+            variant="warning"
+            className="me-2"
+          >
+            <Dropdown.Item eventKey="crearCategoria">Crear Categoría</Dropdown.Item>
+            {/* Aquí puedes agregar más opciones en el futuro */}
           </DropdownButton>
 
           <button className="btn btn-light" onClick={() => navigate('/')}>
