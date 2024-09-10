@@ -1,12 +1,26 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const RegistrarHabitacion = () => {
     const [nombre, setNombre] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [precio, setPrecio] = useState('');
     const [imagenes, setImagenes] = useState([]);
+    const [categorias, setCategorias] = useState([]);
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
     const [alerta, setAlerta] = useState({ mostrar: false, tipo: '', mensaje: '' });
+
+
+    useEffect(() => {
+        // Hacer la solicitud GET para obtener las categorías cuando se carga la página
+        axios.get('http://localhost:8080/categorias')
+            .then(response => {
+                setCategorias(response.data); // Guardar las categorías en el estado
+            })
+            .catch(error => {
+                setAlerta({ mostrar: true, tipo: 'danger', mensaje: error });
+            });
+    }, []);
 
 
 
@@ -16,6 +30,8 @@ const RegistrarHabitacion = () => {
         formData.append('nombre', nombre);
         formData.append('descripcion', descripcion);
         formData.append('precio', parseFloat(precio));
+        console.log("la categoria es: "+categoriaSeleccionada)
+        formData.append('categoria_id', categoriaSeleccionada);
         console.log(typeof precio);
 
         imagenes.forEach((imagen) => {
@@ -53,6 +69,10 @@ const RegistrarHabitacion = () => {
         setImagenes([...e.target.files]);
     };
 
+    const handleCategoriaChange = (e) => {
+        setCategoriaSeleccionada(e.target.value); // Aquí almacenas el ID de la categoría seleccionada
+    };
+
     return (
         <div>
             <h2>Registrar Habitacion</h2>
@@ -75,6 +95,19 @@ const RegistrarHabitacion = () => {
                     <label htmlFor="precio" className="form-label">Precio</label>
                     <input type="number" className="form-control" id="precio" value={precio} onChange={(e) => setPrecio(e.target.value)} />
                 </div>
+
+                <div className="mb-3">
+                    <label htmlFor="categoria" className="form-label">Categoría</label>
+                    <select id="categoria" className="form-select" value={categoriaSeleccionada} onChange={handleCategoriaChange}>
+                        <option value="">Selecciona una categoría</option>
+                        {categorias.map(categoria => (
+                            <option key={categoria.id} value={categoria.id}>
+                                {categoria.nombre}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 <div className="mb-3">
                     <label htmlFor="imagenes" className="form-label">Imágenes</label>
                     <input type="file" className="form-control" id="imagenes" multiple onChange={handleImagenesChange} />

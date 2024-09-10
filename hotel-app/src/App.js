@@ -4,7 +4,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import React from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
+
+import CrearCategoria from './components/CrearCategoria';
 import CrearCuentaCliente from './components/CrearCuentaCliente';
+import EditarHabitacion from './components/EditarHabitacion';
 import FooterAdmin from './components/FooterAdmin';
 import FooterCliente from './components/FooterCliente';
 import GaleriaCompleta from './components/GaleriaCompleta ';
@@ -12,6 +15,7 @@ import HeaderAdmin from './components/HeaderAdmin';
 import HeaderCliente from './components/HeaderCliente';
 import HeaderLoginAdmin from './components/HeaderLoginAdmin';
 import HeaderLoginCliente from './components/HeaderLoginCliente';
+import VerCategorias from './components/VerCategorias';
 import VerHabitacion from './components/VerHabitacion';
 import Administrador from './pages/administrador/Administrador';
 import AdminLogin from './pages/administrador/AdminLogin';
@@ -19,9 +23,6 @@ import RegistrarHabitacion from './pages/administrador/RegistrarHabitacion';
 import ClienteLogin from './pages/cliente/ClienteLogin';
 import VerDetalles from './pages/cliente/VerDetalles';
 import Home from './pages/Home';
-
-import CrearCategoria from './components/CrearCategoria';
-import VerCategorias from './components/VerCategorias';
 import NotFound from './pages/NotFound';
 import './styles/_custom.scss';
 
@@ -72,6 +73,7 @@ function App() {
             <Route path="/administracion" element={<Administrador />} />
             <Route path="/admin/crear-categoria" element={<CrearCategoria />} />
             <Route path="/admin/ver-categorias" element={<VerCategorias />} />
+            <Route path="/admin/editar-habitacion/:id" element={<EditarHabitacion />} />
             
             {/* Otras rutas */}
             <Route path="*" element={<NotFound />} />
