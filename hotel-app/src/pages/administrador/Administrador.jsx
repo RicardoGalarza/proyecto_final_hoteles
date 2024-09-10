@@ -28,6 +28,8 @@ const Administrador = () => {
                 <ul>
                     <li><a href="/admin/crearhabitacion">Crear Habitacion</a></li>
                     <li><a href="/admin/VerHabitacion">Ver Habitaciones</a></li>
+                    <li><a href="/admin/crear-categoria">crear categoria</a></li>
+                    <li><a href="/admin/ver-categorias">ver categorias</a></li>
                     
                 </ul>
                 <p><em>Nota: Esta página no es accesible desde dispositivos móviles.</em></p>

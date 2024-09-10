@@ -15,7 +15,6 @@ import HeaderLoginCliente from './components/HeaderLoginCliente';
 import VerHabitacion from './components/VerHabitacion';
 import Administrador from './pages/administrador/Administrador';
 import AdminLogin from './pages/administrador/AdminLogin';
-import Habitaciones from './pages/administrador/Habitaciones';
 import RegistrarHabitacion from './pages/administrador/RegistrarHabitacion';
 import ClienteLogin from './pages/cliente/ClienteLogin';
 import VerDetalles from './pages/cliente/VerDetalles';
@@ -64,7 +63,6 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<ClienteLogin />} />
             <Route path="/admin/crearhabitacion" element={<RegistrarHabitacion />} />
-            <Route path="/admin/habitaciones" element={<Habitaciones />} />
             <Route path="/verdetalles/:id" element={<VerDetalles />} />
             <Route path="/galeria-completa/:id" element={<GaleriaCompleta />} />
             <Route path="/habitaciones/:id" element={<VerDetalles />} />
@@ -74,6 +72,7 @@ function App() {
             <Route path="/administracion" element={<Administrador />} />
             <Route path="/admin/crear-categoria" element={<CrearCategoria />} />
             <Route path="/admin/ver-categorias" element={<VerCategorias />} />
+            
             {/* Otras rutas */}
             <Route path="*" element={<NotFound />} />
           </Routes>

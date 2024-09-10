@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const HeaderAdmin = () => {
   const navigate = useNavigate();
+  
 
   const handleSelect = (eventKey) => {
     // Navega según la opción seleccionada sin cambiar el título del botón
@@ -22,6 +23,7 @@ const HeaderAdmin = () => {
     <header className="bg-dark text-white py-3">
       <div className="container d-flex justify-content-between align-items-center">
         <h1>Admin</h1>
+        
         <nav className="d-flex">
           <DropdownButton
             id="dropdown-basic-button"
