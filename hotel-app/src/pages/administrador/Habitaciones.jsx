@@ -12,7 +12,7 @@ const Habitaciones = () => {
 
     return (
         <div className="container mt-4">
-            <h2>Habitaciones Disponibles</h2>
+            <h2></h2>
             <div className="row">
                 {rooms.map(room => (
                     <div className="col-md-4" key={room.id}>
