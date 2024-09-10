@@ -22,6 +22,7 @@ import VerDetalles from './pages/cliente/VerDetalles';
 import Home from './pages/Home';
 
 import CrearCategoria from './components/CrearCategoria';
+import VerCategorias from './components/VerCategorias';
 import NotFound from './pages/NotFound';
 import './styles/_custom.scss';
 
@@ -72,6 +73,7 @@ function App() {
             <Route path="/Admin" element={<AdminLogin />} />
             <Route path="/administracion" element={<Administrador />} />
             <Route path="/admin/crear-categoria" element={<CrearCategoria />} />
+            <Route path="/admin/ver-categorias" element={<VerCategorias />} />
             {/* Otras rutas */}
             <Route path="*" element={<NotFound />} />
           </Routes>

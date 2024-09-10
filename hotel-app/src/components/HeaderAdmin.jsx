@@ -12,6 +12,9 @@ const HeaderAdmin = () => {
       navigate('/admin/verhabitacion');
     } else if (eventKey === 'crearCategoria') {
       navigate('/admin/crear-categoria');
+    } else if (eventKey === 'vercategorias') {
+      navigate('/admin/ver-categorias');
+    
     }
   };
 
@@ -40,6 +43,7 @@ const HeaderAdmin = () => {
             className="me-2"
           >
             <Dropdown.Item eventKey="crearCategoria">Crear Categoría</Dropdown.Item>
+            <Dropdown.Item eventKey="vercategorias">Listar Categorias</Dropdown.Item>
             {/* Aquí puedes agregar más opciones en el futuro */}
           </DropdownButton>
 

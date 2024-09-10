@@ -23,7 +23,7 @@ const CrearCategoria = () => {
             alert('Categoría creada con éxito');
 
             // Navega de vuelta a la página de administración o lista de categorías
-            navigate('/admin/vercategorias');
+            navigate('/admin/ver-categorias');
         } catch (error) {
             console.error('Hubo un error al crear la categoría:', error);
             alert('No se pudo crear la categoría');
@@ -35,7 +35,7 @@ const CrearCategoria = () => {
         if (eventKey === 'crearCategoria') {
             // Ya estamos en Crear Categoría
         } else if (eventKey === 'verCategorias') {
-            navigate('/admin/vercategorias');
+            navigate('/admin/ver-categorias');
         }
     };
 
