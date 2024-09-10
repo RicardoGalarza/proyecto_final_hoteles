@@ -10,29 +10,34 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 @Entity
 public class Habitacion {
 
-    @Id
+     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
     private String nombre;
-    
+
     private String descripcion;
+
     private Double precio;
+
+    @ManyToOne
+    @JoinColumn(name = "categoria_id", referencedColumnName = "id")
+    private Categoria categoria;
 
     @OneToMany(mappedBy = "habitacion", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Imagen> imagenes;
 
-    // Getters y Setters
-
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -40,7 +45,7 @@ public class Habitacion {
     }
 
     public String getNombre() {
-        return nombre;
+        return this.nombre;
     }
 
     public void setNombre(String nombre) {
@@ -48,7 +53,7 @@ public class Habitacion {
     }
 
     public String getDescripcion() {
-        return descripcion;
+        return this.descripcion;
     }
 
     public void setDescripcion(String descripcion) {
@@ -56,7 +61,7 @@ public class Habitacion {
     }
 
     public Double getPrecio() {
-        return precio;
+        return this.precio;
     }
 
     public void setPrecio(Double precio) {
@@ -64,10 +69,21 @@ public class Habitacion {
     }
 
     public List<Imagen> getImagenes() {
-        return imagenes;
+        return this.imagenes;
     }
 
     public void setImagenes(List<Imagen> imagenes) {
         this.imagenes = imagenes;
     }
+
+
+    public Categoria getCategoria() {
+        return this.categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
+
+    
 }

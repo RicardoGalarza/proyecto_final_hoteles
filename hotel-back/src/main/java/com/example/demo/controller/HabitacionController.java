@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -23,10 +24,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.dto.EditarHabitacionDto;
+import com.example.demo.model.Categoria;
 import com.example.demo.model.Habitacion;
 import com.example.demo.model.Imagen;
+import com.example.demo.service.CategoriaService;
 import com.example.demo.service.HabitacionService;
 import com.example.demo.service.ImagenService;
+
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/habitaciones")
@@ -36,6 +41,8 @@ public class HabitacionController {
     private HabitacionService habitacionService;
     @Autowired
     private ImagenService imagenService;
+    @Autowired
+    private CategoriaService categoriaService;
 
     @GetMapping
     public List<Habitacion> getAllHabitaciones() {
@@ -47,15 +54,15 @@ public class HabitacionController {
         return habitacionService.getHabitacionById(id);
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
-   
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
     public ResponseEntity<Habitacion> createHabitacion(
             @RequestParam("nombre") String nombre,
             @RequestParam("descripcion") String descripcion,
             @RequestParam("precio") Double precio,
-            //@RequestParam("imagenes") List<MultipartFile> imagenes) 
-            @RequestParam(value = "imagenes") List<MultipartFile> imagenes
-            ){
+            @RequestParam("categoria_id") Long categoriaId,
+            // @RequestParam("imagenes") List<MultipartFile> imagenes)
+            @RequestParam(value = "imagenes") List<MultipartFile> imagenes) {
 
         System.out.println("entro");
 
@@ -64,7 +71,18 @@ public class HabitacionController {
         habitacion.setNombre(nombre);
         habitacion.setDescripcion(descripcion);
         habitacion.setPrecio(precio);
-
+        
+        // Obtener la categoria desde la base de datos usando el ID proporcionado
+        Optional<Categoria> categoriaOptional = categoriaService.getCategoriaById(categoriaId);
+        
+        if (categoriaOptional.isPresent()) {
+            Categoria categoria = categoriaOptional.get();
+            habitacion.setCategoria(categoria);  // Asignar la categoría a la habitación
+        } else {
+            // Si la categoría no se encuentra, puedes manejarlo según tu lógica
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // Devuelve un error si la categoría no existe
+        }
+        
         Habitacion savedHabitacion = habitacionService.saveHabitacion(habitacion);
         Long habitacionId = savedHabitacion.getId();
 
@@ -75,7 +93,8 @@ public class HabitacionController {
             directory.mkdirs(); // Crear la estructura de directorios si no existe
         }
 
-        // Guardar cada imagen en la carpeta correspondiente y actualizar la base de datos
+        // Guardar cada imagen en la carpeta correspondiente y actualizar la base de
+        // datos
         for (MultipartFile imagen : imagenes) {
             try {
                 // Generar la ruta completa donde se guardará la imagen
@@ -88,7 +107,7 @@ public class HabitacionController {
                 Imagen nuevaImagen = new Imagen();
                 nuevaImagen.setNombre(imagen.getOriginalFilename().replace(" ", ""));
                 nuevaImagen.setHabitacion(savedHabitacion);
-                imagenService.saveImagen(nuevaImagen);  // Guarda la imagen con ImagenService
+                imagenService.saveImagen(nuevaImagen); // Guarda la imagen con ImagenService
 
                 System.out.println("Imagen guardada en: " + filePath.toString());
             } catch (IOException e) {
@@ -101,19 +120,21 @@ public class HabitacionController {
     }
 
     @PutMapping("/{id}")
-    public Habitacion updateHabitacion(@PathVariable Long id, @RequestBody Habitacion habitacion) {
-        Optional<Habitacion> existingHabitacion = habitacionService.getHabitacionById(id);
-        if (existingHabitacion.isPresent()) {
-            Habitacion updatedHabitacion = existingHabitacion.get();
-            updatedHabitacion.setNombre(habitacion.getNombre());
-            updatedHabitacion.setDescripcion(habitacion.getDescripcion());
-            updatedHabitacion.setPrecio(habitacion.getPrecio());
-            updatedHabitacion.setImagenes(habitacion.getImagenes());
-            return habitacionService.saveHabitacion(updatedHabitacion);
-        } else {
-            return null;
-        }
+public ResponseEntity<Habitacion> updateHabitacion(@PathVariable Long id, @RequestBody EditarHabitacionDto habitacion) {
+    Optional<Habitacion> existingHabitacion = habitacionService.getHabitacionById(id);
+
+    if (existingHabitacion.isPresent()) {
+        Habitacion updatedHabitacion = existingHabitacion.get();
+        updatedHabitacion.setNombre(habitacion.getNombre());
+        updatedHabitacion.setDescripcion(habitacion.getDescripcion());
+        updatedHabitacion.setPrecio(habitacion.getPrecio());
+        
+        habitacionService.saveHabitacion(updatedHabitacion); // Asegúrate que esta línea guarda los cambios
+        return ResponseEntity.ok(updatedHabitacion);
+    } else {
+        return ResponseEntity.notFound().build();
     }
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteHabitacion(@PathVariable Long id) {

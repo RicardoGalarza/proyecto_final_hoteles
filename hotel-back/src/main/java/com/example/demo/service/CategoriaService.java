@@ -1,6 +1,11 @@
 package com.example.demo.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.model.Categoria;
@@ -16,5 +21,16 @@ public class CategoriaService {
         return categoriaRepository.save(categoria);
     }
 
-    // Otros métodos si los necesitas (obtener, editar, eliminar)
+    public List<Categoria> obtenerCategorias() {
+        return categoriaRepository.findAll();
+    }
+    public Page<Categoria> obtenerCategorias(Pageable pageable) {
+        return categoriaRepository.findAll(pageable); // Uso de la paginación
+    }
+
+    public Optional<Categoria> getCategoriaById(Long categoriaId) {
+        return categoriaRepository.findById(categoriaId);  
+    }
+
+
 }

@@ -1,11 +1,13 @@
 package com.example.demo.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Categoria {
@@ -15,22 +17,30 @@ public class Categoria {
     private Long id;
 
     private String nombre;
+
     private String descripcion;
+
     private String estado;
 
     private LocalDateTime fechaCreacion;
+
+    @OneToMany(mappedBy = "categoria")
+    private List<Habitacion> habitaciones;
+
 
     // Constructor
     public Categoria() {
         this.fechaCreacion = LocalDateTime.now();
     }
 
-    // Getters y Setters
-    // ...
-
     public Long getId() {
-        return id;
+        return this.id;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
 
     public String getNombre() {
         return nombre;
