@@ -1,73 +1,55 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Para redirigir después de crear la cuenta
+import { useNavigate } from 'react-router-dom';
 
-const CrearCuentaCliente = () => {
+const CrearCuentaAdmin = () => {
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
     const [usuario, setUsuario] = useState('');
     const [correo, setCorreo] = useState('');
     const [password, setClave] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [rolId, setRolId] = useState(''); // Campo para seleccionar el rol
     const [alerta, setAlerta] = useState({ mostrar: false, mensaje: '', tipo: '' });
     const [errores, setErrores] = useState({});
     const navigate = useNavigate();
 
-    // Función para validar correo electrónico
-    const validarCorreo = (email) => {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
-    };
-
-    // Función para validar nombre y apellido (mínimo 3 caracteres)
-    const validarNombreApellido = (campo) => {
-        return campo.trim().length >= 3;
-    };
-
-    // Función para validar la contraseña (mínimo 6 caracteres)
-    const validarClave = (clave) => {
-        return clave.length >= 8 && clave.length <= 30;
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    // Validar el formulario
+    const validarFormulario = () => {
         let erroresFormulario = {};
-
-        // Validaciones
-        if (!validarNombreApellido(nombre)) {
+        if (!nombre || nombre.trim().length < 3) {
             erroresFormulario.nombre = 'El nombre debe tener al menos 3 caracteres.';
         }
-
-        if (!validarNombreApellido(apellido)) {
+        if (!apellido || apellido.trim().length < 3) {
             erroresFormulario.apellido = 'El apellido debe tener al menos 3 caracteres.';
         }
-
-        if (!validarCorreo(correo)) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(correo)) {
             erroresFormulario.correo = 'Por favor ingresa un correo electrónico válido.';
         }
-
-        if (!validarClave(password)) {
+        if (!password || password.length < 8) {
             erroresFormulario.password = 'La contraseña debe tener entre 8 y 30 caracteres.';
         }
-
         if (password !== confirmPassword) {
             erroresFormulario.confirmPassword = 'Las contraseñas no coinciden.';
         }
-
-        // Si hay errores, mostrar los mensajes y detener la ejecución
-        if (Object.keys(erroresFormulario).length > 0) {
-            setErrores(erroresFormulario);
-            return;
+        if (!rolId) {
+            erroresFormulario.rolId = 'Debe seleccionar un rol.';
         }
+        setErrores(erroresFormulario);
+        return Object.keys(erroresFormulario).length === 0;
+    };
+
+    // Manejar el envío del formulario
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validarFormulario()) return;
 
         try {
-            const nuevaCuenta = { nombre, apellido, usuario, correo, clave: password };
-            await axios.post('http://localhost:8080/cuentas/crear?rolId=2', nuevaCuenta); // Asignar el rol 2 de cliente directamente en la URL
-            setAlerta({
-                mostrar: true,
-                mensaje: 'Cuenta creada exitosamente.',
-                tipo: 'success',
-            });
+            const nuevaCuenta = { nombre, apellido, usuario, correo, clave: password, rolId };
+            await axios.post(`http://localhost:8080/cuentas/crear?rolId=${rolId}`, nuevaCuenta);
+            setAlerta({ mostrar: true, mensaje: 'Cuenta creada exitosamente.', tipo: 'success' });
 
             // Limpiar los campos después de la creación de la cuenta
             setNombre('');
@@ -76,26 +58,21 @@ const CrearCuentaCliente = () => {
             setCorreo('');
             setClave('');
             setConfirmPassword('');
-            setErrores({}); // Limpiar errores
+            setRolId('');
+            setErrores({});
 
-            // Esperar 3 segundos y redirigir a la página de inicio de sesión
             setTimeout(() => {
-                navigate('/login');
+                navigate('/admin/crear-cuenta');
             }, 3000);
         } catch (error) {
-            setAlerta({
-                mostrar: true,
-                mensaje: 'Error al crear la cuenta.',
-                tipo: 'danger',
-            });
+            setAlerta({ mostrar: true, mensaje: 'Error al crear la cuenta.', tipo: 'danger' });
         }
     };
 
     return (
-        <div className="container" style={{ marginTop: '80px' }}>
-            <h2>Crear Cuenta</h2>
+        <div className="container mt-5">
+            <h2>Crear Cuenta (Admin)</h2>
 
-            {/* Mostrar la alerta de éxito o error */}
             {alerta.mostrar && (
                 <div className={`alert alert-${alerta.tipo} alert-dismissible fade show`} role="alert">
                     {alerta.mensaje}
@@ -116,6 +93,7 @@ const CrearCuentaCliente = () => {
                     />
                     {errores.nombre && <div className="invalid-feedback">{errores.nombre}</div>}
                 </div>
+
                 <div className="mb-3">
                     <label htmlFor="apellido" className="form-label">Apellido</label>
                     <input
@@ -128,17 +106,20 @@ const CrearCuentaCliente = () => {
                     />
                     {errores.apellido && <div className="invalid-feedback">{errores.apellido}</div>}
                 </div>
+
                 <div className="mb-3">
                     <label htmlFor="usuario" className="form-label">Usuario</label>
                     <input
                         type="text"
-                        className="form-control"
+                        className={`form-control ${errores.usuario ? 'is-invalid' : ''}`}
                         id="usuario"
                         value={usuario}
                         onChange={(e) => setUsuario(e.target.value)}
                         required
                     />
+                    {errores.usuario && <div className="invalid-feedback">{errores.usuario}</div>}
                 </div>
+
                 <div className="mb-3">
                     <label htmlFor="correo" className="form-label">Correo Electrónico</label>
                     <input
@@ -151,18 +132,20 @@ const CrearCuentaCliente = () => {
                     />
                     {errores.correo && <div className="invalid-feedback">{errores.correo}</div>}
                 </div>
+
                 <div className="mb-3">
                     <label htmlFor="clave" className="form-label">Contraseña</label>
                     <input
                         type="password"
                         className={`form-control ${errores.password ? 'is-invalid' : ''}`}
-                        id="password"
+                        id="clave"
                         value={password}
                         onChange={(e) => setClave(e.target.value)}
                         required
                     />
                     {errores.password && <div className="invalid-feedback">{errores.password}</div>}
                 </div>
+
                 <div className="mb-3">
                     <label htmlFor="confirmPassword" className="form-label">Confirmar Contraseña</label>
                     <input
@@ -175,10 +158,25 @@ const CrearCuentaCliente = () => {
                     />
                     {errores.confirmPassword && <div className="invalid-feedback">{errores.confirmPassword}</div>}
                 </div>
+
+                <div className="mb-3">
+                    <label htmlFor="rol" className="form-label">Rol</label>
+                    <select
+                        value={rolId}
+                        onChange={(e) => setRolId(e.target.value)}
+                        className="form-select"
+                    >
+                        <option value="">Seleccionar rol</option>
+                        <option value="1">Administrador</option>
+                        <option value="2">Cliente</option>
+                    </select>
+                    {errores.rolId && <div className="invalid-feedback">{errores.rolId}</div>}
+                </div>
+
                 <button type="submit" className="btn btn-primary">Crear Cuenta</button>
             </form>
         </div>
     );
 };
 
-export default CrearCuentaCliente;
+export default CrearCuentaAdmin;

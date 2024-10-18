@@ -5,19 +5,22 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
 @Entity
 public class Habitacion {
 
-     @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -28,13 +31,26 @@ public class Habitacion {
 
     private Double precio;
 
-    @ManyToOne
-    @JoinColumn(name = "categoria_id", referencedColumnName = "id")
-    private Categoria categoria;
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "categoria_habitacion", joinColumns = @JoinColumn(name = "habitacion_id"), inverseJoinColumns = @JoinColumn(name = "categoria_id"))
+    private List<Categoria> categorias;
+
+    @ElementCollection
+    @CollectionTable(name = "habitacion_caracteristicas", joinColumns = @JoinColumn(name = "habitacion_id"))
+    @Column(name = "caracteristica")
+    private List<String> caracteristicas;
 
     @OneToMany(mappedBy = "habitacion", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Imagen> imagenes;
+
+    public List<String> getCaracteristicas() {
+        return caracteristicas;
+    }
+
+    public void setCaracteristicas(List<String> caracteristicas) {
+        this.caracteristicas = caracteristicas;
+    }
 
     public Long getId() {
         return this.id;
@@ -76,14 +92,12 @@ public class Habitacion {
         this.imagenes = imagenes;
     }
 
-
-    public Categoria getCategoria() {
-        return this.categoria;
+    public List<Categoria> getCategorias() {
+        return categorias;
     }
 
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
+    public void setCategorias(List<Categoria> categorias) {
+        this.categorias = categorias;
     }
 
-    
 }

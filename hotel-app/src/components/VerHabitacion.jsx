@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Badge, Button, Modal, Pagination } from 'react-bootstrap'; // Importamos Pagination de react-bootstrap
 import { useNavigate } from 'react-router-dom';
 
 const VerHabitacion = () => {
@@ -9,6 +9,11 @@ const VerHabitacion = () => {
   const [showModal, setShowModal] = useState(false);
   const [productoAEliminar, setProductoAEliminar] = useState(null);
   const [alerta, setAlerta] = useState({ visible: false, mensaje: '', tipo: '' });
+
+  // Variables para la paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productosPerPage] = useState(5);  // Número de productos por página
+  const totalPaginas = Math.ceil(productos.length / productosPerPage);
 
   useEffect(() => {
     axios.get('http://localhost:8080/habitaciones')
@@ -52,7 +57,20 @@ const VerHabitacion = () => {
 
   const handleEditar = (id) => {
     navigate(`/admin/editar-habitacion/${id}`);  // Redirige a la página de edición con el ID de la habitación
-};
+  };
+
+  // Nueva función para manejar la administración de características
+  const handleCaracteristicas = (id) => {
+    navigate(`/admin/habitacion/${id}/caracteristicas`);  // Redirige a la página de administración de características
+  };
+
+  // Obtener los productos actuales para la paginación
+  const indexOfLastProducto = currentPage * productosPerPage;
+  const indexOfFirstProducto = indexOfLastProducto - productosPerPage;
+  const currentProductos = productos.slice(indexOfFirstProducto, indexOfLastProducto);
+
+  // Cambiar de página
+  const paginacion = (numeroPagina) => setCurrentPage(numeroPagina);
 
   return (
     <div className="container mt-5">
@@ -71,25 +89,51 @@ const VerHabitacion = () => {
           <tr>
             <th>Id</th>
             <th>Nombre</th>
-            <th>Categoria</th>
+            <th>Categorías</th> {/* Cambiamos el título a plural */}
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {productos.map((producto) => (
+          {currentProductos.map((producto) => (
             <tr key={producto.id}>
               <td>{producto.id}</td>
               <td>{producto.nombre}</td>
-              <td>{producto.categoria.nombre}</td>
+              <td>
+                {producto.categorias && producto.categorias.length > 0 ? (
+                  producto.categorias.map((categoria) => (
+                    <Badge key={categoria.id} bg="light" text="dark" className="me-1">
+                      {categoria.nombre}
+                    </Badge>
+                  ))
+                ) : (
+                  <Badge bg="light" text="dark">Sin categoría</Badge>
+                )}
+              </td>
               <td>
                 <button className="btn btn-primary me-2">Ver</button>
                 <button className="btn btn-secondary me-2" onClick={() => handleEditar(producto.id)}>Editar</button>
-                <button className="btn btn-danger" onClick={() => handleShow(producto)}>Eliminar</button>
+                <button className="btn btn-danger me-2" onClick={() => handleShow(producto)}>Eliminar</button>
+                {/* Agregamos un nuevo botón para administrar características */}
+                <button className="btn btn-secondary me-2" onClick={() => handleCaracteristicas(producto.id)}>
+                  Características
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Paginación */}
+      <Pagination className="justify-content-center">
+        <Pagination.First onClick={() => paginacion(1)} disabled={currentPage === 1} />
+        <Pagination.Prev onClick={() => paginacion(currentPage - 1)} disabled={currentPage === 1} />
+
+        {/* Mostrando el número de la página actual */}
+        <Pagination.Item active>{currentPage}</Pagination.Item>
+
+        <Pagination.Next onClick={() => paginacion(currentPage + 1)} disabled={currentPage === totalPaginas} />
+        <Pagination.Last onClick={() => paginacion(totalPaginas)} disabled={currentPage === totalPaginas} />
+      </Pagination>
 
       {/* Modal de confirmación */}
       <Modal show={showModal} onHide={handleClose}>

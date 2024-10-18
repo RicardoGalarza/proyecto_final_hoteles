@@ -1,15 +1,20 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Pagination } from 'react-bootstrap';
+import { Button, Modal, Pagination } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 const VerCategorias = () => {
+    const navigate = useNavigate();
     const [categorias, setCategorias] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1); // Total de páginas
+    const [showModal, setShowModal] = useState(false);
+    const [categoriaAEliminar, setCategoriaAEliminar] = useState(null);
+    const [alerta, setAlerta] = useState({ visible: false, mensaje: '', tipo: '' });
 
     const obtenerCategorias = async (page) => {
         try {
-            const response = await axios.get(`http://localhost:8080/categorias/pageable?page=${page - 1}&size=15`); 
+            const response = await axios.get(`http://localhost:8080/categorias/pageable?page=${page - 1}&size=15`);
             // Restamos 1 porque en Spring Boot, la paginación empieza en 0
             setCategorias(response.data.content); // Lista de categorías
             setTotalPaginas(response.data.totalPages); // Total de páginas
@@ -27,9 +32,52 @@ const VerCategorias = () => {
         obtenerCategorias(pageNumber);
     };
 
+    const handleEditar = (id) => {
+        navigate(`/admin/editar-categoria/${id}`);
+    };
+
+    const handleClose = () => setShowModal(false);
+
+    const handleShow = (categoria) => {
+        setCategoriaAEliminar(categoria);
+        setShowModal(true);
+    };
+
+    const eliminarCategoria = () => {
+        if (categoriaAEliminar) {
+            axios.delete(`http://localhost:8080/categorias/${categoriaAEliminar.id}`)
+                .then(() => {
+                    setCategorias(categorias.filter(categoria => categoria.id !== categoriaAEliminar.id));
+                    setAlerta({
+                        visible: true,
+                        mensaje: 'Categoria eliminada con éxito',
+                        tipo: 'success'
+                    });
+                    setShowModal(false);
+                })
+                .catch(error => {
+                    console.error('Hubo un error al eliminar la categoria:', error);
+                    setAlerta({
+                        visible: true,
+                        mensaje: 'No se pudo eliminar la categoria',
+                        tipo: 'danger'
+                    });
+                    setShowModal(false);
+                });
+        }
+    };
+
     return (
         <div className="container mt-5">
             <h2>Listado de Categorías</h2>
+
+            {alerta.visible && (
+                <div className={`alert alert-${alerta.tipo} alert-dismissible fade show`} role="alert">
+                    {alerta.mensaje}
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
+
             {categorias.length > 0 ? (
                 <table className="table table-striped">
                     <thead>
@@ -37,7 +85,7 @@ const VerCategorias = () => {
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
-                            <th>Estado</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,7 +94,10 @@ const VerCategorias = () => {
                                 <td>{categoria.id}</td>
                                 <td>{categoria.nombre}</td>
                                 <td>{categoria.descripcion}</td>
-                                <td>{categoria.estado}</td>
+                                <td>
+                                    <button className="btn btn-secondary me-2" onClick={() => handleEditar(categoria.id)}>Editar</button>
+                                    <button className="btn btn-danger" onClick={() => handleShow(categoria)}>Eliminar</button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -71,6 +122,23 @@ const VerCategorias = () => {
                 ))}
                 <Pagination.Last onClick={() => paginacion(totalPaginas)} disabled={currentPage === totalPaginas} />
             </Pagination>
+
+
+            <Modal show={showModal} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar Eliminación</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>¿Estás seguro de que deseas eliminar esta categoria?</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Cancelar
+                    </Button>
+                    <Button variant="danger" onClick={eliminarCategoria}>
+                        Eliminar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
         </div>
     );
 };

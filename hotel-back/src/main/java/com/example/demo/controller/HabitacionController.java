@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,7 @@ import com.example.demo.dto.EditarHabitacionDto;
 import com.example.demo.model.Categoria;
 import com.example.demo.model.Habitacion;
 import com.example.demo.model.Imagen;
+import com.example.demo.repository.HabitacionRepository;
 import com.example.demo.service.CategoriaService;
 import com.example.demo.service.HabitacionService;
 import com.example.demo.service.ImagenService;
@@ -43,6 +46,8 @@ public class HabitacionController {
     private ImagenService imagenService;
     @Autowired
     private CategoriaService categoriaService;
+    @Autowired
+    private HabitacionRepository habitacionRepository;
 
     @GetMapping
     public List<Habitacion> getAllHabitaciones() {
@@ -54,13 +59,17 @@ public class HabitacionController {
         return habitacionService.getHabitacionById(id);
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping("/categoria/{id}")
+    public List<Habitacion> getHabitacionByCategoriaId(@PathVariable Long id) {
+        return habitacionService.getHabitacionByCategoriaId(id);
+    }
 
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Habitacion> createHabitacion(
             @RequestParam("nombre") String nombre,
             @RequestParam("descripcion") String descripcion,
             @RequestParam("precio") Double precio,
-            @RequestParam("categoria_id") Long categoriaId,
+            @RequestParam("categorias") String categorias,
             // @RequestParam("imagenes") List<MultipartFile> imagenes)
             @RequestParam(value = "imagenes") List<MultipartFile> imagenes) {
 
@@ -71,18 +80,15 @@ public class HabitacionController {
         habitacion.setNombre(nombre);
         habitacion.setDescripcion(descripcion);
         habitacion.setPrecio(precio);
-        
-        // Obtener la categoria desde la base de datos usando el ID proporcionado
-        Optional<Categoria> categoriaOptional = categoriaService.getCategoriaById(categoriaId);
-        
-        if (categoriaOptional.isPresent()) {
-            Categoria categoria = categoriaOptional.get();
-            habitacion.setCategoria(categoria);  // Asignar la categoría a la habitación
-        } else {
-            // Si la categoría no se encuentra, puedes manejarlo según tu lógica
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // Devuelve un error si la categoría no existe
-        }
-        
+
+        List<Long> categoriaIds = Arrays.stream(categorias.replace("[", "").replace("]", "").split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+
+        List<Categoria> categoriasObj = categoriaService.getCategoriasByIds(categoriaIds);
+
+        habitacion.setCategorias(categoriasObj);
+
         Habitacion savedHabitacion = habitacionService.saveHabitacion(habitacion);
         Long habitacionId = savedHabitacion.getId();
 
@@ -120,21 +126,36 @@ public class HabitacionController {
     }
 
     @PutMapping("/{id}")
-public ResponseEntity<Habitacion> updateHabitacion(@PathVariable Long id, @RequestBody EditarHabitacionDto habitacion) {
-    Optional<Habitacion> existingHabitacion = habitacionService.getHabitacionById(id);
+    public ResponseEntity<Habitacion> updateHabitacion(@PathVariable Long id,
+            @RequestBody EditarHabitacionDto habitacion) {
+        Optional<Habitacion> existingHabitacion = habitacionService.getHabitacionById(id);
 
-    if (existingHabitacion.isPresent()) {
-        Habitacion updatedHabitacion = existingHabitacion.get();
-        updatedHabitacion.setNombre(habitacion.getNombre());
-        updatedHabitacion.setDescripcion(habitacion.getDescripcion());
-        updatedHabitacion.setPrecio(habitacion.getPrecio());
-        
-        habitacionService.saveHabitacion(updatedHabitacion); // Asegúrate que esta línea guarda los cambios
-        return ResponseEntity.ok(updatedHabitacion);
-    } else {
-        return ResponseEntity.notFound().build();
+        if (existingHabitacion.isPresent()) {
+            Habitacion updatedHabitacion = existingHabitacion.get();
+            updatedHabitacion.setNombre(habitacion.getNombre());
+            updatedHabitacion.setDescripcion(habitacion.getDescripcion());
+            updatedHabitacion.setPrecio(habitacion.getPrecio());
+
+            habitacionService.saveHabitacion(updatedHabitacion); // Asegúrate que esta línea guarda los cambios
+            return ResponseEntity.ok(updatedHabitacion);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
-}
+
+    @PutMapping("/{id}/caracteristicas")
+    public ResponseEntity<?> actualizarCaracteristicas(@PathVariable Long id,
+            @RequestBody List<String> caracteristicas) {
+        Optional<Habitacion> habitacionOpt = habitacionRepository.findById(id);
+        if (habitacionOpt.isPresent()) {
+            Habitacion habitacion = habitacionOpt.get();
+            habitacion.setCaracteristicas(caracteristicas);
+            habitacionRepository.save(habitacion);
+            return ResponseEntity.ok().body("Características actualizadas correctamente");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Habitación no encontrada");
+        }
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteHabitacion(@PathVariable Long id) {

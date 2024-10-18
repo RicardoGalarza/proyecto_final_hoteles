@@ -72,21 +72,7 @@ const CrearCategoria = () => {
                         required
                     />
                 </div>
-
-                <div className="mb-3">
-                    <label htmlFor="estado" className="form-label">Estado</label>
-                    <select
-                        className="form-select"
-                        id="estado"
-                        value={estado}
-                        onChange={(e) => setEstado(e.target.value)}
-                        required
-                    >
-                        <option value="">Seleccione un estado</option>
-                        <option value="activo">Activo</option>
-                        <option value="inactivo">Inactivo</option>
-                    </select>
-                </div>
+                
 
                 <button type="submit" className="btn btn-primary">Crear Categoría</button>
             </form>

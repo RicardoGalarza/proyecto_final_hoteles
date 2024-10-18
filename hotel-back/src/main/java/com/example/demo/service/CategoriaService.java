@@ -32,5 +32,19 @@ public class CategoriaService {
         return categoriaRepository.findById(categoriaId);  
     }
 
+    public Categoria saveCategoria(Categoria categoria) {
+        return categoriaRepository.save(categoria);
+    }
+
+    public void deleteCategoria(Long id) {
+        categoriaRepository.deleteById(id);
+    }
+
+
+    public List<Categoria> getCategoriasByIds(List<Long> categoriaIds) {
+        return categoriaRepository.findAllById(categoriaIds);
+    }
+    
+
 
 }

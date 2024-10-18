@@ -7,7 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 public class Categoria {
@@ -20,13 +20,10 @@ public class Categoria {
 
     private String descripcion;
 
-    private String estado;
-
     private LocalDateTime fechaCreacion;
 
-    @OneToMany(mappedBy = "categoria")
+    @ManyToMany(mappedBy = "categorias")
     private List<Habitacion> habitaciones;
-
 
     // Constructor
     public Categoria() {
@@ -56,14 +53,6 @@ public class Categoria {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
     }
 
     public LocalDateTime getFechaCreacion() {
