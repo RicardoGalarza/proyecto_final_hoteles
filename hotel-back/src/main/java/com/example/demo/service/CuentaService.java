@@ -7,14 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.model.Cuenta;
+import com.example.demo.model.Rol;
 import com.example.demo.repository.CuentaRepository;
+import com.example.demo.repository.RolRepository;
 
 @Service
 public class CuentaService {
 
     @Autowired
     private CuentaRepository cuentaRepository;
-
+@Autowired
+    private RolRepository rolRepository;
     public List<Cuenta> getAllCuentas() {
         return cuentaRepository.findAll();
     }
@@ -38,4 +41,35 @@ public class CuentaService {
     public void deleteCuenta(Long id) {
         cuentaRepository.deleteById(id);
     }
+
+    public Optional<Long> authenticateCuenta(String correo, String clave) {
+        Cuenta cuenta = cuentaRepository.findByCorreoAndClave(correo, clave);
+        return Optional.ofNullable(cuenta).map(Cuenta::getId);
+    }
+
+    public void actualizarRol(Long id, Long rolId) {
+        Optional<Cuenta> cuentaOpt = cuentaRepository.findById(id);
+        if (cuentaOpt.isPresent()) {
+            Cuenta cuenta = cuentaOpt.get();
+            cuenta.setRol(new Rol(rolId));  // Asigna el rol según el ID
+            cuentaRepository.save(cuenta);
+        } else {
+            throw new RuntimeException("Cuenta no encontrada");
+        }
+    }
+
+    public Cuenta crearCuenta(Cuenta nuevaCuenta, Long rolId) {
+        // Buscar el rol por ID
+        Rol rol = rolRepository.findById(rolId)
+                .orElseThrow(() -> new RuntimeException("Rol no encontrado con id: " + rolId));
+
+        // Asignar el rol a la cuenta
+        System.out.println(rol.toString()); 
+        nuevaCuenta.setRol(rol);
+
+        // Guardar la cuenta en la base de datos
+        return cuentaRepository.save(nuevaCuenta);
+    }
+
+    
 }

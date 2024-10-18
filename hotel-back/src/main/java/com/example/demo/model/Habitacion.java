@@ -5,11 +5,16 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
 @Entity
@@ -21,18 +26,34 @@ public class Habitacion {
 
     @Column(unique = true)
     private String nombre;
-    
+
     private String descripcion;
+
     private Double precio;
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "categoria_habitacion", joinColumns = @JoinColumn(name = "habitacion_id"), inverseJoinColumns = @JoinColumn(name = "categoria_id"))
+    private List<Categoria> categorias;
+
+    @ElementCollection
+    @CollectionTable(name = "habitacion_caracteristicas", joinColumns = @JoinColumn(name = "habitacion_id"))
+    @Column(name = "caracteristica")
+    private List<String> caracteristicas;
 
     @OneToMany(mappedBy = "habitacion", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Imagen> imagenes;
 
-    // Getters y Setters
+    public List<String> getCaracteristicas() {
+        return caracteristicas;
+    }
+
+    public void setCaracteristicas(List<String> caracteristicas) {
+        this.caracteristicas = caracteristicas;
+    }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -40,7 +61,7 @@ public class Habitacion {
     }
 
     public String getNombre() {
-        return nombre;
+        return this.nombre;
     }
 
     public void setNombre(String nombre) {
@@ -48,7 +69,7 @@ public class Habitacion {
     }
 
     public String getDescripcion() {
-        return descripcion;
+        return this.descripcion;
     }
 
     public void setDescripcion(String descripcion) {
@@ -56,7 +77,7 @@ public class Habitacion {
     }
 
     public Double getPrecio() {
-        return precio;
+        return this.precio;
     }
 
     public void setPrecio(Double precio) {
@@ -64,10 +85,19 @@ public class Habitacion {
     }
 
     public List<Imagen> getImagenes() {
-        return imagenes;
+        return this.imagenes;
     }
 
     public void setImagenes(List<Imagen> imagenes) {
         this.imagenes = imagenes;
     }
+
+    public List<Categoria> getCategorias() {
+        return categorias;
+    }
+
+    public void setCategorias(List<Categoria> categorias) {
+        this.categorias = categorias;
+    }
+
 }

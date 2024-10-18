@@ -39,4 +39,9 @@ public class HabitacionService {
     public void deleteHabitacion(Long id) {
         habitacionRepository.deleteById(id);
     }
+
+    public List<Habitacion>  getHabitacionByCategoriaId(Long id) {
+        return habitacionRepository.findByCategorias_Id(id);
+    }
+    
 }
