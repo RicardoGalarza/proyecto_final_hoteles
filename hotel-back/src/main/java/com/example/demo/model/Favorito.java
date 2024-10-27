@@ -1,32 +1,30 @@
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
-public class Imagen {
-
+@Table(name = "favoritos")
+public class Favorito {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
+    @ManyToOne
+    @JoinColumn(name = "id_cuenta", nullable = false)  // Aquí cambiamos a "id_cuenta"
+    private Cuenta cuenta;  // Relacionamos con la entidad Cuenta
 
     @ManyToOne
-    @JoinColumn(name = "habitacion_id", nullable = false)
-    @JsonBackReference("habitacion-imagen")
-    @JsonIgnore
-    private Habitacion habitacion;
+    @JoinColumn(name = "id_habitacion", nullable = false)
+    private Habitacion habitacion;  // Relacionamos con la entidad Habitacion
 
     // Getters y Setters
-
     public Long getId() {
         return id;
     }
@@ -35,12 +33,12 @@ public class Imagen {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public Cuenta getCuenta() {
+        return cuenta;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setCuenta(Cuenta cuenta) {
+        this.cuenta = cuenta;
     }
 
     public Habitacion getHabitacion() {
