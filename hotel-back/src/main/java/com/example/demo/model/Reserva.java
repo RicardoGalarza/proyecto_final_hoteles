@@ -1,8 +1,8 @@
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.LocalDate;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,21 +11,20 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Imagen {
-
+public class Reserva {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
-
     @ManyToOne
-    @JoinColumn(name = "habitacion_id", nullable = false)
-    @JsonBackReference("habitacion-imagen")
-    @JsonIgnore
+    @JoinColumn(name = "habitacion_id")
     private Habitacion habitacion;
 
-    // Getters y Setters
+    @Column(nullable = false)
+    private LocalDate fechaReserva;
+
+    @Column(nullable = false)
+    private Long clienteId;
 
     public Long getId() {
         return id;
@@ -35,14 +34,6 @@ public class Imagen {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
     public Habitacion getHabitacion() {
         return habitacion;
     }
@@ -50,4 +41,22 @@ public class Imagen {
     public void setHabitacion(Habitacion habitacion) {
         this.habitacion = habitacion;
     }
+
+    public LocalDate getFechaReserva() {
+        return fechaReserva;
+    }
+
+    public void setFechaReserva(LocalDate fechaReserva) {
+        this.fechaReserva = fechaReserva;
+    }
+
+    public Long getClienteId() {
+        return clienteId;
+    }
+
+    public void setClienteId(Long clienteId) {
+        this.clienteId = clienteId;
+    }
+
+   
 }

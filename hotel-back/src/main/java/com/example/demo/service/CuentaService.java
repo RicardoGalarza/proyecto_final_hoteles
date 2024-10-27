@@ -11,6 +11,8 @@ import com.example.demo.model.Rol;
 import com.example.demo.repository.CuentaRepository;
 import com.example.demo.repository.RolRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class CuentaService {
 
@@ -71,5 +73,9 @@ public class CuentaService {
         return cuentaRepository.save(nuevaCuenta);
     }
 
+    public Cuenta findById(Long id) {
+        return cuentaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cuenta no encontrada con id: " + id));
+    }
     
 }
