@@ -33,6 +33,7 @@ const VerHabitacion = () => {
 
   const eliminarHabitacion = () => {
     if (productoAEliminar) {
+      console.log(productoAEliminar.id); // Verifica que el ID sea correcto
       axios.delete(`http://localhost:8080/habitaciones/${productoAEliminar.id}`)
         .then(() => {
           setProductos(productos.filter(producto => producto.id !== productoAEliminar.id));
@@ -42,6 +43,12 @@ const VerHabitacion = () => {
             tipo: 'success'
           });
           setShowModal(false);  // Cierra el modal después de eliminar
+
+          // Ocultar la alerta después de 5 segundos y refrescar la página
+          setTimeout(() => {
+            setAlerta({ visible: false, mensaje: '', tipo: '' });
+            window.location.reload(); // Recargar la página
+          }, 3000);
         })
         .catch(error => {
           console.error('Hubo un error al eliminar la habitación:', error);
@@ -51,6 +58,11 @@ const VerHabitacion = () => {
             tipo: 'danger'
           });
           setShowModal(false);  // Cierra el modal en caso de error
+
+          // Ocultar la alerta después de 5 segundos
+          setTimeout(() => {
+            setAlerta({ visible: false, mensaje: '', tipo: '' });
+          }, 5000);
         });
     }
   };
