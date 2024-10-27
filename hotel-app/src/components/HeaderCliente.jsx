@@ -63,6 +63,15 @@ const HeaderCliente = () => {
                             className="rounded-circle"
                             style={{ height: '40px', width: '40px', marginRight: '10px' }}
                         />
+                        <h2 className="trivago-title">
+                            <span className="trivago-red">T</span>
+                            <span className="trivago-blue">r</span>
+                            <span className="trivago-orange">i</span>
+                            <span className="trivago-green">v</span>
+                            <span className="trivago-blue">a</span>
+                            <span className="trivago-orange">g</span>
+                            <span className="trivago-blue">o</span>
+                        </h2>
                     </Link>
 
                     <button
@@ -113,7 +122,10 @@ const HeaderCliente = () => {
                                         <li>
                                             <Link to="/InformacionPersonal" className="dropdown-item">Mi cuenta</Link>
                                         </li>
-                                        
+                                        <li>
+                                            <Link to="/favoritos" className="dropdown-item">Favoritos</Link>
+                                        </li>
+
                                         <li><hr className="dropdown-divider" /></li>
                                         <li>
                                             <button onClick={handleLogout} className="dropdown-item">Cerrar sesión</button>

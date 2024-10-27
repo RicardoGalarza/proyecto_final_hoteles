@@ -83,27 +83,30 @@ const HeaderAdmin = () => {
         <h1>Admin</h1>
 
         <nav className="d-flex">
-          {/* Botones de Cuentas */}
-          {(permissions.find(p => p.nombre === 'crear cuentas') ||
-            permissions.find(p => p.nombre === 'listar cuentas')) && (
-              <DropdownButton
-                id="dropdown-cuentas-button"
-                title="Cuentas"
-                onSelect={(eventKey) => navigate(eventKey)} // Esto permite navegar al seleccionar un ítem
-                variant="warning"
-                className="me-2"
-              >
-                {/* Crear Cuenta */}
-                {permissions.find(p => p.nombre === 'crear cuentas') && (
-                  <Dropdown.Item eventKey="/admin/crear-cuenta">Crear Cuenta</Dropdown.Item>
-                )}
-
-                {/* Listar Cuentas */}
-                {permissions.find(p => p.nombre === 'listar cuentas') && (
-                  <Dropdown.Item eventKey="/admin/listar-cuentas">Listar Cuentas</Dropdown.Item>
-                )}
-              </DropdownButton>
+        {/* Botones de Cuentas */}
+        {(permissions.find(p => p.nombre === 'crear cuentas') ||
+          permissions.find(p => p.nombre === 'listar cuentas')) && (
+          <DropdownButton
+            id="dropdown-cuentas-button"
+            title="Cuentas"
+            variant="warning"
+            className="me-2"
+          >
+            {/* Crear Cuenta */}
+            {permissions.find(p => p.nombre === 'crear cuentas') && (
+              <Dropdown.Item eventKey="/admin/crear-cuenta" onClick={() => navigate('/admin/crear-cuenta')}>
+                Crear Cuenta
+              </Dropdown.Item>
             )}
+
+            {/* Listar Cuentas */}
+            {permissions.find(p => p.nombre === 'listar cuentas') && (
+              <Dropdown.Item eventKey="/admin/listar-cuentas" onClick={() => navigate('/admin/listar-cuentas')}>
+                Listar Cuentas
+              </Dropdown.Item>
+            )}
+          </DropdownButton>
+        )}
 
 
           {(permissions.find(p => p.nombre === 'crear habitacion') ||
