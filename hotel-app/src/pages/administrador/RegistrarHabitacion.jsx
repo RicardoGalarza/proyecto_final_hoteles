@@ -9,18 +9,34 @@ const RegistrarHabitacion = () => {
     const [imagenes, setImagenes] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState([]); // Inicializar como array
+    const [ciudades, setCiudades] = useState([]);
+    const [ciudadSeleccionada, setCiudadSeleccionada] = useState(null); // Guardar la ciudad seleccionada
+    const [huespedesAdultos, setHuespedesAdultos] = useState(1); // Inicializar con un valor predeterminado
+    const [huespedesNinos, setHuespedesNinos] = useState(0); // Inicializar con un valor predeterminado
     const [alerta, setAlerta] = useState({ mostrar: false, tipo: '', mensaje: '' });
 
     useEffect(() => {
-        // Hacer la solicitud GET para obtener las categorías cuando se carga la página
+        // Hacer la solicitud GET para obtener las categorías y las ciudades cuando se carga la página
         axios.get('http://localhost:8080/categorias')
             .then(response => {
-                // Transformar los datos para que funcionen con react-select
                 const opcionesCategorias = response.data.map(categoria => ({
                     value: categoria.id,
                     label: categoria.nombre
                 }));
-                setCategorias(opcionesCategorias); // Guardar las categorías en el estado
+                setCategorias(opcionesCategorias);
+            })
+            .catch(error => {
+                setAlerta({ mostrar: true, tipo: 'danger', mensaje: error });
+            });
+
+        // Obtener la lista de ciudades
+        axios.get('http://localhost:8080/ciudades')
+            .then(response => {
+                const opcionesCiudades = response.data.map(ciudad => ({
+                    value: ciudad.id,
+                    label: ciudad.nombre
+                }));
+                setCiudades(opcionesCiudades);
             })
             .catch(error => {
                 setAlerta({ mostrar: true, tipo: 'danger', mensaje: error });
@@ -38,9 +54,19 @@ const RegistrarHabitacion = () => {
         const categoriasSeleccionadasIds = categoriaSeleccionada.map(option => option.value);
         formData.append('categorias', JSON.stringify(categoriasSeleccionadasIds));
 
+        // Enviar ciudad seleccionada
+        if (ciudadSeleccionada) {
+            formData.append('ciudad', ciudadSeleccionada.value);
+        }
+
+        // Enviar imágenes seleccionadas
         imagenes.forEach((imagen) => {
             formData.append('imagenes', imagen);
         });
+
+        // Enviar cantidad de huéspedes
+        formData.append('huespedesAdultos', huespedesAdultos);
+        formData.append('huespedesNinos', huespedesNinos);
 
         try {
             const response = await axios.post('http://localhost:8080/habitaciones', formData, {
@@ -51,9 +77,21 @@ const RegistrarHabitacion = () => {
 
             console.log(response.data);
             setAlerta({ mostrar: true, tipo: 'success', mensaje: '¡Habitación registrada con éxito!' });
+
+            // Ocultar la alerta después de 5 segundos y refrescar la página
+            setTimeout(() => {
+                setAlerta({ mostrar: false, tipo: '', mensaje: '' });
+                window.location.reload(); // Refrescar la página
+            }, 5000);
+
         } catch (error) {
             console.error('Error al registrar la habitación:', error);
             setAlerta({ mostrar: true, tipo: 'danger', mensaje: 'Hubo un error al registrar la habitación.' });
+
+            // Ocultar la alerta después de 5 segundos
+            setTimeout(() => {
+                setAlerta({ mostrar: false, tipo: '', mensaje: '' });
+            }, 3000);
         }
     };
 
@@ -63,6 +101,10 @@ const RegistrarHabitacion = () => {
 
     const handleCategoriaChange = (selectedOptions) => {
         setCategoriaSeleccionada(selectedOptions); // Guardar las categorías seleccionadas
+    };
+
+    const handleCiudadChange = (selectedOption) => {
+        setCiudadSeleccionada(selectedOption); // Guardar la ciudad seleccionada
     };
 
     return (
@@ -96,6 +138,38 @@ const RegistrarHabitacion = () => {
                         value={categoriaSeleccionada}
                         onChange={handleCategoriaChange}
                         placeholder="Selecciona una o más categorías"
+                    />
+                </div>
+
+                <div className="mb-3">
+                    <label htmlFor="ciudad" className="form-label">Ciudad</label>
+                    <Select
+                        options={ciudades}
+                        value={ciudadSeleccionada}
+                        onChange={handleCiudadChange}
+                        placeholder="Selecciona una ciudad"
+                    />
+                </div>
+
+                <div className="mb-3">
+                    <label htmlFor="huespedesAdultos" className="form-label">Huéspedes Adultos</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        id="huespedesAdultos"
+                        value={huespedesAdultos}
+                        onChange={(e) => setHuespedesAdultos(e.target.value)}
+                    />
+                </div>
+
+                <div className="mb-3">
+                    <label htmlFor="huespedesNinos" className="form-label">Huéspedes Niños</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        id="huespedesNinos"
+                        value={huespedesNinos}
+                        onChange={(e) => setHuespedesNinos(e.target.value)}
                     />
                 </div>
 

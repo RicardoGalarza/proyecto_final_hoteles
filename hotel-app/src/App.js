@@ -11,6 +11,7 @@ import CrearCuentaAdmin from './components/CrearCuentaAdmin';
 import CrearCuentaCliente from './components/CrearCuentaCliente';
 import EditarCategoria from './components/EditarCategoria';
 import EditarHabitacion from './components/EditarHabitacion';
+import Favoritos from './components/Favoritos';
 import FooterAdmin from './components/FooterAdmin';
 import FooterCliente from './components/FooterCliente';
 import GaleriaCompleta from './components/GaleriaCompleta ';
@@ -24,7 +25,6 @@ import Administrador from './pages/administrador/Administrador';
 import RegistrarHabitacion from './pages/administrador/RegistrarHabitacion';
 import ClienteLogin from './pages/cliente/ClienteLogin';
 import VerDetalles from './pages/cliente/VerDetalles';
-
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './routes/ProtectedRoute';
@@ -84,6 +84,8 @@ function App() {
             <Route path="/admin/habitacion/:id/caracteristicas" element={<AdministrarCaracteristicas />} />
             <Route path="/InformacionPersonal" element={<InformacionPersonal />} />
             <Route path="/admin/listar-cuentas" element={<ListarCuentas />} />
+            <Route path="/favoritos" element={<Favoritos />} />
+
             {/* Otras rutas */}
             <Route path="*" element={<NotFound />} />
 
