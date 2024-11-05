@@ -1,7 +1,5 @@
 package com.example.demo.model;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDate;
 
 @Entity
 public class Reserva {
@@ -24,7 +23,22 @@ public class Reserva {
     private LocalDate fechaReserva;
 
     @Column(nullable = false)
+    private LocalDate fechaFinReserva;
+
+    @Column(nullable = false)
     private Long clienteId;
+
+    @Column(nullable = false)
+    private boolean confirmado = false;
+
+
+    public boolean isConfirmado() {
+        return confirmado;
+    }
+
+    public void setConfirmado(boolean confirmado) {
+        this.confirmado = confirmado;
+    }
 
     public Long getId() {
         return id;
@@ -50,6 +64,14 @@ public class Reserva {
         this.fechaReserva = fechaReserva;
     }
 
+    public LocalDate getFechaFinReserva() {
+        return fechaFinReserva;
+    }
+
+    public void setFechaFinReserva(LocalDate fechaFinReserva) {
+        this.fechaFinReserva = fechaFinReserva;
+    }
+
     public Long getClienteId() {
         return clienteId;
     }
@@ -58,5 +80,4 @@ public class Reserva {
         this.clienteId = clienteId;
     }
 
-   
 }

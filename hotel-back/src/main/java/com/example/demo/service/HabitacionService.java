@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.model.Caracteristica;
 import com.example.demo.model.Habitacion;
+import com.example.demo.repository.HabitacionCaracteristicasRepository;
 import com.example.demo.repository.HabitacionRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -18,6 +20,9 @@ public class HabitacionService {
 
     @Autowired
     private HabitacionRepository habitacionRepository;
+
+    @Autowired
+    private HabitacionCaracteristicasRepository habitacionCaracteristicasRepository;
 
     public Habitacion crearHabitacion(Habitacion habitacion) {
         try {
@@ -56,8 +61,22 @@ public class HabitacionService {
         return habitacionRepository.findByCiudad_Id(idCiudad);
     }
 
-    public List<Habitacion> filtrarHabitaciones(Long destino, LocalDate fechaLlegada, LocalDate fechaSalida, Integer adultos, Integer ninos) {
-        return habitacionRepository.filtrarHabitaciones(destino, fechaLlegada, fechaSalida, adultos, ninos);
+    public List<Habitacion> filtrarHabitaciones(Long destino, List<Long> categorias, LocalDate fechaLlegada, LocalDate fechaSalida, Integer adultos, Integer ninos) {
+        return habitacionRepository.filtrarHabitaciones(destino, categorias, fechaLlegada, fechaSalida, adultos, ninos);
+    }
+    
+    
+
+    public List<Habitacion> buscarHabitaciones(String busqueda) {
+        return habitacionRepository.buscarPorNombreYDescripcion(busqueda);
     }
 
+    public List<Caracteristica> obtenerCaracteristicasPorHabitacionId(Long habitacionId) {
+        // Obtener la habitación para verificar que existe
+        Habitacion habitacion = habitacionRepository.findById(habitacionId)
+                .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada con ID: " + habitacionId));
+        
+        // Obtener las características a través de la tabla intermedia
+        return habitacionCaracteristicasRepository.findCaracteristicasByHabitacionId(habitacionId);
+    }
 }

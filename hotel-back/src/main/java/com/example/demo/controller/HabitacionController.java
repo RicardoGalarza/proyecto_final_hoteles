@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,16 +29,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.demo.dto.EditarHabitacionDto;
+import com.example.demo.model.Caracteristica;
 import com.example.demo.model.Categoria;
 import com.example.demo.model.Ciudad;
 import com.example.demo.model.Habitacion;
 import com.example.demo.model.Imagen;
+import com.example.demo.model.Politica;
 import com.example.demo.repository.CiudadRepository;
-import com.example.demo.repository.HabitacionRepository;
+import com.example.demo.service.CaracteristicaService;
 import com.example.demo.service.CategoriaService;
 import com.example.demo.service.HabitacionService;
 import com.example.demo.service.ImagenService;
+import com.example.demo.service.PoliticaService;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -46,18 +49,27 @@ public class HabitacionController {
 
     @Autowired
     private HabitacionService habitacionService;
+
     @Autowired
     private ImagenService imagenService;
+
     @Autowired
     private CategoriaService categoriaService;
-    @Autowired
-    private HabitacionRepository habitacionRepository;
+
     @Autowired
     private CiudadRepository ciudadRepository;
 
+    @Autowired
+    private PoliticaService politicaService;
+
+    @Autowired
+    private CaracteristicaService caractertisticaService;
+
     @GetMapping
     public List<Habitacion> getAllHabitaciones() {
-        return habitacionService.getAllHabitaciones();
+        List<Habitacion> habitaciones = habitacionService.getAllHabitaciones();
+        Collections.shuffle(habitaciones); // Mezcla la lista de forma aleatoria
+        return habitaciones;
     }
 
     @GetMapping("/{id}")
@@ -85,7 +97,10 @@ public class HabitacionController {
             @RequestParam("imagenes") List<MultipartFile> imagenes,
             @RequestParam("ciudad") Long idCiudad,
             @RequestParam("huespedesAdultos") int huespedesAdultos,
-            @RequestParam("huespedesNinos") int huespedesNinos) {
+            @RequestParam("huespedesNinos") int huespedesNinos,
+            @RequestParam("whatsapp") String whatsapp,
+            @RequestParam("politicas") String politicas,
+            @RequestParam("caracteristicas") String caracteristicas) {
 
         System.out.println("entro");
         Ciudad ciudad = ciudadRepository.findById(idCiudad)
@@ -98,6 +113,7 @@ public class HabitacionController {
         habitacion.setCiudad(ciudad);
         habitacion.setHuespedesAdultos(huespedesAdultos);
         habitacion.setHuespedesNinos(huespedesNinos);
+        habitacion.setWhatsapp(whatsapp);
 
         List<Long> categoriaIds = Arrays.stream(categorias.replace("[", "").replace("]", "").split(","))
                 .map(Long::parseLong)
@@ -106,6 +122,22 @@ public class HabitacionController {
         List<Categoria> categoriasObj = categoriaService.getCategoriasByIds(categoriaIds);
 
         habitacion.setCategorias(categoriasObj);
+
+        // Manejar las políticas
+        List<Long> politicaIds = Arrays.stream(politicas.replace("[", "").replace("]", "").split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+
+        List<Politica> politicasObj = politicaService.getPoliticasByIds(politicaIds);
+        habitacion.setPoliticas(politicasObj);
+
+        // Manejar las caracteristicas
+        List<Long> caracteristicasIds = Arrays.stream(caracteristicas.replace("[", "").replace("]", "").split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+
+        List<Caracteristica> caracteristicasObj = caractertisticaService.getCaracteristicasByIds(caracteristicasIds);
+        habitacion.setCaracteristicas(caracteristicasObj);
 
         Habitacion savedHabitacion = habitacionService.saveHabitacion(habitacion);
         Long habitacionId = savedHabitacion.getId();
@@ -117,8 +149,6 @@ public class HabitacionController {
             directory.mkdirs(); // Crear la estructura de directorios si no existe
         }
 
-        // Guardar cada imagen en la carpeta correspondiente y actualizar la base de
-        // datos
         for (MultipartFile imagen : imagenes) {
             try {
                 // Generar la ruta completa donde se guardará la imagen
@@ -139,58 +169,112 @@ public class HabitacionController {
                 return ResponseEntity.status(500).build();
             }
         }
-
         return ResponseEntity.ok(savedHabitacion);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Habitacion> updateHabitacion(@PathVariable Long id,
-            @RequestBody EditarHabitacionDto habitacion) {
-        Optional<Habitacion> existingHabitacion = habitacionService.getHabitacionById(id);
-
-        if (existingHabitacion.isPresent()) {
-            Habitacion updatedHabitacion = existingHabitacion.get();
-            updatedHabitacion.setNombre(habitacion.getNombre());
-            updatedHabitacion.setDescripcion(habitacion.getDescripcion());
-            updatedHabitacion.setPrecio(habitacion.getPrecio());
-
-            habitacionService.saveHabitacion(updatedHabitacion); // Asegúrate que esta línea guarda los cambios
-            return ResponseEntity.ok(updatedHabitacion);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
     }
 
     @PutMapping("/{id}/caracteristicas")
     public ResponseEntity<?> actualizarCaracteristicas(@PathVariable Long id,
-            @RequestBody List<String> caracteristicas) {
-        Optional<Habitacion> habitacionOpt = habitacionRepository.findById(id);
-        if (habitacionOpt.isPresent()) {
-            Habitacion habitacion = habitacionOpt.get();
-            habitacion.setCaracteristicas(caracteristicas);
-            habitacionRepository.save(habitacion);
-            return ResponseEntity.ok().body("Características actualizadas correctamente");
+            @RequestBody List<Long> caracteristicaIds) {
+        boolean actualizado = caractertisticaService.actualizarCaracteristicas(id, caracteristicaIds);
+
+        if (actualizado) {
+            return ResponseEntity.ok("Características actualizadas correctamente");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Habitación no encontrada");
         }
     }
 
+    @GetMapping("/{id}/caracteristicas")
+    public List<Caracteristica> obtenerCaracteristicasPorHabitacionId(@PathVariable Long id) {
+        return habitacionService.obtenerCaracteristicasPorHabitacionId(id);
+    }
+
+    @PutMapping("/{id}")
+public ResponseEntity<Habitacion> updateHabitacion(
+        @PathVariable Long id,
+        @RequestParam("nombre") String nombre,
+        @RequestParam("descripcion") String descripcion,
+        @RequestParam("precio") Double precio,
+        @RequestParam("categorias") String categorias,
+        @RequestParam(value = "imagenes", required = false) List<MultipartFile> imagenes,
+        @RequestParam("ciudad") Long idCiudad,
+        @RequestParam("huespedesAdultos") int huespedesAdultos,
+        @RequestParam("huespedesNinos") int huespedesNinos,
+        @RequestParam("whatsapp") String whatsapp,
+        @RequestParam(value = "politicas", required = false) String politicas,
+        @RequestParam(value = "caracteristicas", required = false) String caracteristicas) {
+
+    Optional<Habitacion> existingHabitacion = habitacionService.getHabitacionById(id);
+    if (existingHabitacion.isPresent()) {
+        Habitacion updatedHabitacion = existingHabitacion.get();
+
+        // Actualizar los campos simples
+        updatedHabitacion.setNombre(nombre);
+        updatedHabitacion.setDescripcion(descripcion);
+        updatedHabitacion.setPrecio(precio);
+        updatedHabitacion.setHuespedesAdultos(huespedesAdultos);
+        updatedHabitacion.setHuespedesNinos(huespedesNinos);
+        updatedHabitacion.setWhatsapp(whatsapp);
+
+        // Actualizar la ciudad
+        Ciudad ciudad = ciudadRepository.findById(idCiudad)
+                .orElseThrow(() -> new IllegalArgumentException("Ciudad no encontrada"));
+        updatedHabitacion.setCiudad(ciudad);
+
+        // Manejar las categorías
+        if (categorias != null && !categorias.isEmpty() && !categorias.equals("[]")) {
+            List<Long> categoriaIds = Arrays.stream(categorias.replace("[", "").replace("]", "").split(","))
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            List<Categoria> categoriasObj = categoriaService.getCategoriasByIds(categoriaIds);
+            updatedHabitacion.setCategorias(categoriasObj);
+        }
+
+        // Manejar las políticas
+        if (politicas != null && !politicas.isEmpty() && !politicas.equals("[]")) {
+            List<Long> politicaIds = Arrays.stream(politicas.replace("[", "").replace("]", "").split(","))
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            List<Politica> politicasObj = politicaService.getPoliticasByIds(politicaIds);
+            updatedHabitacion.setPoliticas(politicasObj);
+        }
+
+        // Manejar las características
+        if (caracteristicas != null && !caracteristicas.isEmpty() && !caracteristicas.equals("[]")) {
+            List<Long> caracteristicaIds = Arrays.stream(caracteristicas.replace("[", "").replace("]", "").split(","))
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            List<Caracteristica> caracteristicasObj = caractertisticaService.getCaracteristicasByIds(caracteristicaIds);
+            updatedHabitacion.setCaracteristicas(caracteristicasObj);
+        }
+
+        habitacionService.saveHabitacion(updatedHabitacion); // Guardar la habitación actualizada
+        return ResponseEntity.ok(updatedHabitacion);
+    } else {
+        return ResponseEntity.notFound().build();
+    }
+}
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteHabitacion(@PathVariable Long id) {
         habitacionService.deleteHabitacion(id);
         return ResponseEntity.ok("Habitación eliminada con éxito");
     }
 
-
     @GetMapping("/filtrar")
     public ResponseEntity<List<Habitacion>> filtrarHabitaciones(
             @RequestParam(required = false) Long destino,
+            @RequestParam(required = false) List<Long> categorias,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaLlegada,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaSalida,
             @RequestParam(required = false) Integer adultos,
             @RequestParam(required = false) Integer ninos) {
-
-        List<Habitacion> habitaciones = habitacionService.filtrarHabitaciones(destino, fechaLlegada, fechaSalida, adultos, ninos);
+        List<Habitacion> habitaciones = habitacionService.filtrarHabitaciones(destino, categorias, fechaLlegada,
+                fechaSalida, adultos, ninos);
         return ResponseEntity.ok(habitaciones);
+    }
+
+    @GetMapping("/buscar")
+    public List<Habitacion> buscarHabitaciones(@RequestParam String busqueda) {
+        return habitacionService.buscarHabitaciones(busqueda);
     }
 }

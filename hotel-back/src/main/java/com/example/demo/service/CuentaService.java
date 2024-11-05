@@ -18,7 +18,7 @@ public class CuentaService {
 
     @Autowired
     private CuentaRepository cuentaRepository;
-@Autowired
+    @Autowired
     private RolRepository rolRepository;
     public List<Cuenta> getAllCuentas() {
         return cuentaRepository.findAll();
