@@ -105,6 +105,32 @@ const HeaderAdmin = () => {
                 Listar Cuentas
               </Dropdown.Item>
             )}
+
+          </DropdownButton>
+        )}
+
+
+        {(permissions.find(p => p.nombre === 'listar caracteristicas') ||
+          permissions.find(p => p.nombre === 'crear caracteristica')) && (
+          <DropdownButton
+            id="dropdown-cuentas-button"
+            title="Caracteristicas"
+            variant="warning"
+            className="me-2"
+          >
+            {/* Listar Caracteristicas */}
+            {permissions.find(p => p.nombre === 'listar caracteristicas') && (
+              <Dropdown.Item eventKey="/admin/ver-caracteristicas" onClick={() => navigate('/admin/ver-caracteristicas')}>
+                Listar Caracteristicas
+              </Dropdown.Item>
+            )}
+  
+            {permissions.find(p => p.nombre === 'crear caracteristica') && (
+              <Dropdown.Item eventKey="/admin/crear-caracteristica" onClick={() => navigate('/admin/crear-caracteristica')}>
+                Crear Caracteristica
+              </Dropdown.Item>
+            )}
+
           </DropdownButton>
         )}
 

@@ -7,7 +7,7 @@ const VerCategorias = () => {
     const navigate = useNavigate();
     const [categorias, setCategorias] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPaginas, setTotalPaginas] = useState(1); // Total de páginas
+    const [totalPaginas, setTotalPaginas] = useState(1);
     const [showModal, setShowModal] = useState(false);
     const [categoriaAEliminar, setCategoriaAEliminar] = useState(null);
     const [alerta, setAlerta] = useState({ visible: false, mensaje: '', tipo: '' });
@@ -15,17 +15,16 @@ const VerCategorias = () => {
     const obtenerCategorias = async (page) => {
         try {
             const response = await axios.get(`http://localhost:8080/categorias/pageable?page=${page - 1}&size=15`);
-            // Restamos 1 porque en Spring Boot, la paginación empieza en 0
-            setCategorias(response.data.content); // Lista de categorías
-            setTotalPaginas(response.data.totalPages); // Total de páginas
-            setCurrentPage(page); // Actualiza la página actual
+            setCategorias(response.data.content);
+            setTotalPaginas(response.data.totalPages);
+            setCurrentPage(page);
         } catch (error) {
             console.error('Error al obtener las categorías:', error);
         }
     };
 
     useEffect(() => {
-        obtenerCategorias(1); // Cargar la primera página cuando el componente se monte
+        obtenerCategorias(1);
     }, []);
 
     const paginacion = (pageNumber) => {
@@ -50,16 +49,16 @@ const VerCategorias = () => {
                     setCategorias(categorias.filter(categoria => categoria.id !== categoriaAEliminar.id));
                     setAlerta({
                         visible: true,
-                        mensaje: 'Categoria eliminada con éxito',
+                        mensaje: 'Categoría eliminada con éxito',
                         tipo: 'success'
                     });
                     setShowModal(false);
                 })
                 .catch(error => {
-                    console.error('Hubo un error al eliminar la categoria:', error);
+                    console.error('Hubo un error al eliminar la categoría:', error);
                     setAlerta({
                         visible: true,
-                        mensaje: 'No se pudo eliminar la categoria',
+                        mensaje: 'No se pudo eliminar la categoría',
                         tipo: 'danger'
                     });
                     setShowModal(false);
@@ -85,6 +84,7 @@ const VerCategorias = () => {
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
+                            <th>Imagen</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -94,6 +94,17 @@ const VerCategorias = () => {
                                 <td>{categoria.id}</td>
                                 <td>{categoria.nombre}</td>
                                 <td>{categoria.descripcion}</td>
+                                <td>
+                                    {categoria.nombreImagen ? (
+                                        <img
+                                            src={`http://localhost:8080/${categoria.nombreImagen}`}
+                                            alt={categoria.nombre}
+                                            style={{ width: '50px', height: 'auto' }}
+                                        />
+                                    ) : (
+                                        'Sin imagen'
+                                    )}
+                                </td>
                                 <td>
                                     <button className="btn btn-secondary me-2" onClick={() => handleEditar(categoria.id)}>Editar</button>
                                     <button className="btn btn-danger" onClick={() => handleShow(categoria)}>Eliminar</button>
@@ -123,12 +134,12 @@ const VerCategorias = () => {
                 <Pagination.Last onClick={() => paginacion(totalPaginas)} disabled={currentPage === totalPaginas} />
             </Pagination>
 
-
+            {/* Modal de Confirmación de Eliminación */}
             <Modal show={showModal} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirmar Eliminación</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>¿Estás seguro de que deseas eliminar esta categoria?</Modal.Body>
+                <Modal.Body>¿Estás seguro de que deseas eliminar esta categoría?</Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
                         Cancelar
@@ -138,7 +149,6 @@ const VerCategorias = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-
         </div>
     );
 };

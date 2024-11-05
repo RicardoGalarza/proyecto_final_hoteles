@@ -6,23 +6,28 @@ import { useNavigate } from 'react-router-dom';
 const CrearCategoria = () => {
     const [nombre, setNombre] = useState('');
     const [descripcion, setDescripcion] = useState('');
-    const [estado, setEstado] = useState('');
-    const [mostrarAlerta, setMostrarAlerta] = useState(false); // Estado para controlar la alerta
+    const [imagen, setImagen] = useState(null); // Estado para el archivo de imagen
+    const [mostrarAlerta, setMostrarAlerta] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const nuevaCategoria = {
-            nombre,
-            descripcion,
-            estado,
-        };
+        const formData = new FormData();
+        formData.append('nombre', nombre);
+        formData.append('descripcion', descripcion);
+        if (imagen) {
+            formData.append('imagen', imagen);
+        }
 
         try {
             // Envía la categoría a tu API para guardarla
-            await axios.post('http://localhost:8080/categorias', nuevaCategoria);
-            
+            await axios.post('http://localhost:8080/categorias', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
             // Mostrar la alerta de éxito
             setMostrarAlerta(true);
 
@@ -39,9 +44,8 @@ const CrearCategoria = () => {
 
     return (
         <div className="container mt-5">
-            <h2>Crear Categorías</h2>
+            <h2>Crear Categoría</h2>
 
-            {/* Mostrar la alerta si la categoría fue creada con éxito */}
             {mostrarAlerta && (
                 <Alert variant="success" onClose={() => setMostrarAlerta(false)} dismissible>
                     Categoría creada con éxito
@@ -72,7 +76,16 @@ const CrearCategoria = () => {
                         required
                     />
                 </div>
-                
+
+                <div className="mb-3">
+                    <label htmlFor="imagen" className="form-label">Imagen</label>
+                    <input
+                        type="file"
+                        className="form-control"
+                        id="imagen"
+                        onChange={(e) => setImagen(e.target.files[0])}
+                    />
+                </div>
 
                 <button type="submit" className="btn btn-primary">Crear Categoría</button>
             </form>

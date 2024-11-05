@@ -13,7 +13,7 @@ const FooterCliente = () => {
               className="rounded-circle"
               style={{ height: '40px', width: '40px', marginRight: '10px' }}
             />
-            <p className="mb-0">© 2024 Hotel Booking. Todos los derechos reservados.</p>
+            <p className="mb-0">© 2024 Hotel Ricardo. Todos los derechos reservados.</p>
           </div>
           <div className="col-md-6 text-md-end mt-3 mt-md-0">
             <p className="mb-0">Dirección de la empresa o información adicional</p>

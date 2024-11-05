@@ -1,63 +1,89 @@
-import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { addMonths, format, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import axios from 'axios';
+import { addMonths, eachDayOfInterval, endOfMonth, format, startOfMonth } from 'date-fns';
+import React, { useEffect, useState } from 'react';
 
-const CalendarioDoble = ({ habitacionId }) => {
-  // Estado para almacenar las fechas no disponibles
+const CalendarioDoble = ({ habitacionId, onFechaSeleccionada, actualizarCalendario }) => {
   const [fechasNoDisponibles, setFechasNoDisponibles] = useState([]);
-  const [error, setError] = useState(null);
+  const [fechaInicio, setFechaInicio] = useState(null);
+  const [fechaFin, setFechaFin] = useState(null);
 
-  // Mes actual y siguiente
   const mesActual = new Date();
   const mesSiguiente = addMonths(mesActual, 1);
 
-  // Función para obtener fechas no disponibles desde la API
+  // Función para cargar las fechas no disponibles
+  const fetchFechasNoDisponibles = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/reserva/fechas-no-disponibles/habitacion/${habitacionId}`);
+      const fechas = response.data.flatMap(rango => 
+        eachDayOfInterval({
+          start: new Date(rango.fechaInicio + 'T00:00'),
+          end: new Date(rango.fechaFin + 'T00:00')
+        }).map(dia => format(dia, 'yyyy-MM-dd'))
+      );
+      setFechasNoDisponibles(fechas);
+
+      // Restablece las fechas seleccionadas al actualizar las fechas no disponibles
+      setFechaInicio(null);
+      setFechaFin(null);
+    } catch (err) {
+      console.error('Error al cargar las fechas no disponibles');
+    }
+  };
+
+  // Efecto para cargar las fechas al inicio y cuando `actualizarCalendario` cambie
   useEffect(() => {
-    const fetchFechasNoDisponibles = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8080/reserva/fechas-no-disponibles/habitacion/${habitacionId}`);
-        setFechasNoDisponibles(response.data); // Asume que la API retorna un array de strings con formato 'yyyy-MM-dd'
-      } catch (err) {
-        setError('Error al cargar las fechas no disponibles');
-      }
-    };
-
     fetchFechasNoDisponibles();
-  }, [habitacionId]);
+  }, [habitacionId, actualizarCalendario]);
 
-  // Función para generar días del mes y marcar no disponibles
   const generarDiasMes = (mes) => {
     const inicioMes = startOfMonth(mes);
     const finMes = endOfMonth(mes);
     return eachDayOfInterval({ start: inicioMes, end: finMes }).map((dia) => ({
       fecha: dia,
       noDisponible: fechasNoDisponibles.includes(format(dia, 'yyyy-MM-dd')),
+      seleccionado:
+        (fechaInicio && !fechaFin && dia.getTime() === fechaInicio.getTime()) ||
+        (fechaInicio && fechaFin && dia >= fechaInicio && dia <= fechaFin),
     }));
   };
 
-  // Días de cada mes
+  const handleDayClick = (dia) => {
+    if (!fechaInicio || (fechaInicio && fechaFin)) {
+      // Si no hay fecha de inicio o ya hay un rango seleccionado, reinicia y selecciona una nueva fecha de inicio
+      setFechaInicio(dia);
+      setFechaFin(null);
+      onFechaSeleccionada(dia, null);
+    } else if (dia.getTime() === fechaInicio.getTime()) {
+      // Si se hace clic en la misma fecha, se trata de una reserva de un solo día
+      setFechaFin(dia);
+      onFechaSeleccionada(fechaInicio, dia);
+    } else if (dia > fechaInicio) {
+      // Si se hace clic en una fecha posterior, establece la fecha final
+      setFechaFin(dia);
+      onFechaSeleccionada(fechaInicio, dia);
+    }
+  };
+
   const diasMesActual = generarDiasMes(mesActual);
   const diasMesSiguiente = generarDiasMes(mesSiguiente);
 
   return (
     <div className="container mt-4">
-      {error && <div className="alert alert-danger">{error}</div>}
-
       <div className="row">
-        {/* Mes actual */}
         <div className="col">
           <h5>{format(mesActual, 'MMMM yyyy')}</h5>
           <div className="d-flex flex-wrap">
             {diasMesActual.map((dia, index) => (
               <div
                 key={index}
-                className={`p-2 border ${dia.noDisponible ? '#3c3c3c' : 'transparent'}`}
+                className="p-2 border"
+                onClick={() => !dia.noDisponible && handleDayClick(dia.fecha)}
                 style={{
-                    width: '14.28%',
-                    textAlign: 'center',
-                    backgroundColor: dia.noDisponible ? '#eeeeee' : 'transparent', // Color hexadecimal
-                    color: dia.noDisponible ? 'white' : 'black' // Color de texto opcional
+                  width: '14.28%',
+                  textAlign: 'center',
+                  cursor: dia.noDisponible ? 'not-allowed' : 'pointer',
+                  color: dia.noDisponible ? 'grey' : dia.seleccionado ? 'white' : 'black',
+                  backgroundColor: dia.seleccionado ? '#804000' : dia.noDisponible ? '#e0e0e0' : 'transparent',
                 }}
               >
                 {format(dia.fecha, 'd')}
@@ -66,19 +92,20 @@ const CalendarioDoble = ({ habitacionId }) => {
           </div>
         </div>
 
-        {/* Mes siguiente */}
         <div className="col">
           <h5>{format(mesSiguiente, 'MMMM yyyy')}</h5>
           <div className="d-flex flex-wrap">
             {diasMesSiguiente.map((dia, index) => (
               <div
                 key={index}
-                className={`p-2 border ${dia.noDisponible ? 'bg-secondary text-white' : ''}`}
+                className="p-2 border"
+                onClick={() => !dia.noDisponible && handleDayClick(dia.fecha)}
                 style={{
-                    width: '14.28%',
-                    textAlign: 'center',
-                    backgroundColor: dia.noDisponible ? '#eeeeee' : 'transparent', // Color hexadecimal
-                    color: dia.noDisponible ? 'white' : 'black' // Color de texto opcional
+                  width: '14.28%',
+                  textAlign: 'center',
+                  cursor: dia.noDisponible ? 'not-allowed' : 'pointer',
+                  color: dia.noDisponible ? 'grey' : dia.seleccionado ? 'white' : 'black',
+                  backgroundColor: dia.seleccionado ? '#804000' : dia.noDisponible ? '#e0e0e0' : 'transparent',
                 }}
               >
                 {format(dia.fecha, 'd')}

@@ -54,25 +54,17 @@ const HeaderCliente = () => {
 
     return (
         <header>
-            <nav className="navbar navbar-expand-lg navbar-light bg-light py-3">
-                <div className="container">
-                    <Link to="/" className="navbar-brand d-flex align-items-center">
-                        <img
-                            src="https://img.freepik.com/vector-premium/logo-diseno-hotel_423075-16.jpg"
-                            alt="Logo de la empresa"
-                            className="rounded-circle"
-                            style={{ height: '40px', width: '40px', marginRight: '10px' }}
-                        />
-                        <h2 className="trivago-title">
-                            <span className="trivago-red">T</span>
-                            <span className="trivago-blue">r</span>
-                            <span className="trivago-orange">i</span>
-                            <span className="trivago-green">v</span>
-                            <span className="trivago-blue">a</span>
-                            <span className="trivago-orange">g</span>
-                            <span className="trivago-blue">o</span>
-                        </h2>
-                    </Link>
+        <nav className="navbar navbar-expand-lg navbar-light bg-light py-3">
+            <div className="container d-flex align-items-center">
+                <Link to="/" className="navbar-brand d-flex align-items-center">
+                    <img
+                        src="https://img.freepik.com/vector-premium/logo-diseno-hotel_423075-16.jpg"
+                        alt="Logo de la empresa"
+                        className="rounded-circle"
+                        style={{ height: '50px', width: '50px', marginRight: '15px' }}
+                    />
+                    <h2 className="m-0" style={{ fontWeight: 'bold', fontSize: '24px' }}>Hotel Ricardo</h2>
+                </Link>
 
                     <button
                         className="navbar-toggler"
@@ -124,6 +116,10 @@ const HeaderCliente = () => {
                                         </li>
                                         <li>
                                             <Link to="/favoritos" className="dropdown-item">Favoritos</Link>
+                                        </li>
+
+                                        <li>
+                                            <Link to="/historial" className="dropdown-item">Mi Historial</Link>
                                         </li>
 
                                         <li><hr className="dropdown-divider" /></li>

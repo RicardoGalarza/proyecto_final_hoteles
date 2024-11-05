@@ -5,7 +5,9 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import React from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
-import AdministrarCaracteristicas from './components/AdministrarCaracteristicas';
+
+import ConfirmarReserva from './components/ConfirmarReserva';
+import CrearCaracteristica from './components/CrearCaracteristica';
 import CrearCategoria from './components/CrearCategoria';
 import CrearCuentaAdmin from './components/CrearCuentaAdmin';
 import CrearCuentaCliente from './components/CrearCuentaCliente';
@@ -18,12 +20,14 @@ import GaleriaCompleta from './components/GaleriaCompleta ';
 import HeaderAdmin from './components/HeaderAdmin';
 import HeaderCliente from './components/HeaderCliente';
 import InformacionPersonal from './components/InformacionPersonal';
+import ListarCaracteristicas from './components/ListarCaracteristicas';
 import ListarCuentas from './components/ListarCuentas';
 import VerCategorias from './components/VerCategorias';
 import VerHabitacion from './components/VerHabitacion';
 import Administrador from './pages/administrador/Administrador';
 import RegistrarHabitacion from './pages/administrador/RegistrarHabitacion';
 import ClienteLogin from './pages/cliente/ClienteLogin';
+import HistorialReservas from './pages/cliente/HistorialReservas';
 import VerDetalles from './pages/cliente/VerDetalles';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
@@ -81,19 +85,26 @@ function App() {
             <Route path="/admin/ver-categorias" element={<VerCategorias />} />
             <Route path="/admin/editar-habitacion/:id" element={<EditarHabitacion />} />
             <Route path="/admin/editar-categoria/:id" element={<EditarCategoria />} />
-            <Route path="/admin/habitacion/:id/caracteristicas" element={<AdministrarCaracteristicas />} />
+
             <Route path="/InformacionPersonal" element={<InformacionPersonal />} />
             <Route path="/admin/listar-cuentas" element={<ListarCuentas />} />
             <Route path="/favoritos" element={<Favoritos />} />
+            <Route path="/historial" element={<HistorialReservas />} />
+
+            
 
             {/* Otras rutas */}
             <Route path="*" element={<NotFound />} />
+            <Route path="/reserva/confirmar" element={<ConfirmarReserva />} />
+
 
             {/* Rutas protegidas */}
             <Route path="/admin/crearhabitacion" element={<ProtectedRoute><RegistrarHabitacion /></ProtectedRoute>} />
             <Route path="/admin/verhabitacion" element={<ProtectedRoute><VerHabitacion /></ProtectedRoute>} />
             <Route path="/admin/crear-categoria" element={<ProtectedRoute><CrearCategoria /></ProtectedRoute>} />
-            <Route path="/admin/ver-categorias" element={<ProtectedRoute><VerCategorias /></ProtectedRoute>
+            <Route path="/admin/ver-categorias" element={<ProtectedRoute><VerCategorias /></ProtectedRoute>} />
+            <Route path="/admin/ver-caracteristicas" element={<ProtectedRoute><ListarCaracteristicas /></ProtectedRoute>} />
+            <Route path="/admin/crear-caracteristica" element={<ProtectedRoute><CrearCaracteristica /></ProtectedRoute>
             }
             />
           </Routes>

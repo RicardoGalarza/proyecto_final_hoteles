@@ -101,7 +101,14 @@ const Favoritos = () => {
                         <div className="col-md-6 mb-4" key={favorito.habitacion.id}>
                             <div className="card h-100" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', borderRadius: '15px', overflow: 'hidden' }}>
                                 {/* Contenedor de la imagen con altura fija */}
-                                <div style={{ flex: '1 0 40%', height: '200px', overflow: 'hidden' }}>
+                                <div
+                                    style={{
+                                        flex: '1 0 40%',
+                                        height: '250px', 
+                                        overflow: 'hidden',
+                                        position: 'relative' 
+                                    }}
+                                >
                                     <img
                                         src={`http://localhost:8080/${favorito.habitacion.id}/${favorito.habitacion.imagenes[0].nombre}`}
                                         alt={favorito.habitacion.nombre}
@@ -111,7 +118,8 @@ const Favoritos = () => {
                                 </div>
 
                                 {/* Contenido de la tarjeta */}
-                                <div className="card-body" style={{ flex: '1 0 60%', padding: '15px', overflow: 'hidden', height: '200px' }}>
+
+                                <div className="card-body" style={{ flex: '1 0 60%', padding: '15px', overflow: 'hidden', height: '250px' }}>
                                     <h5 className="card-title">{favorito.habitacion.nombre}</h5>
                                     <p className="card-text" style={{ maxHeight: '60px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{favorito.habitacion.descripcion}</p>
 

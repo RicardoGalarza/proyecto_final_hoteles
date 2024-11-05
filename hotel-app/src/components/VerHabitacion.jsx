@@ -122,13 +122,9 @@ const VerHabitacion = () => {
                 )}
               </td>
               <td>
-                <button className="btn btn-primary me-2">Ver</button>
                 <button className="btn btn-secondary me-2" onClick={() => handleEditar(producto.id)}>Editar</button>
                 <button className="btn btn-danger me-2" onClick={() => handleShow(producto)}>Eliminar</button>
                 {/* Agregamos un nuevo botón para administrar características */}
-                <button className="btn btn-secondary me-2" onClick={() => handleCaracteristicas(producto.id)}>
-                  Características
-                </button>
               </td>
             </tr>
           ))}
