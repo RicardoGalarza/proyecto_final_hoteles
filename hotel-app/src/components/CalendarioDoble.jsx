@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { addMonths, eachDayOfInterval, endOfMonth, format, startOfMonth } from 'date-fns';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 const CalendarioDoble = ({ habitacionId, onFechaSeleccionada, actualizarCalendario }) => {
   const [fechasNoDisponibles, setFechasNoDisponibles] = useState([]);
@@ -10,10 +10,9 @@ const CalendarioDoble = ({ habitacionId, onFechaSeleccionada, actualizarCalendar
   const mesActual = new Date();
   const mesSiguiente = addMonths(mesActual, 1);
 
-  // Función para cargar las fechas no disponibles
-  const fetchFechasNoDisponibles = async () => {
+  const fetchFechasNoDisponibles = useCallback(async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/reserva/fechas-no-disponibles/habitacion/${habitacionId}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/reserva/fechas-no-disponibles/habitacion/${habitacionId}`);
       const fechas = response.data.flatMap(rango => 
         eachDayOfInterval({
           start: new Date(rango.fechaInicio + 'T00:00'),
@@ -21,19 +20,16 @@ const CalendarioDoble = ({ habitacionId, onFechaSeleccionada, actualizarCalendar
         }).map(dia => format(dia, 'yyyy-MM-dd'))
       );
       setFechasNoDisponibles(fechas);
-
-      // Restablece las fechas seleccionadas al actualizar las fechas no disponibles
       setFechaInicio(null);
       setFechaFin(null);
     } catch (err) {
       console.error('Error al cargar las fechas no disponibles');
     }
-  };
+  }, [habitacionId]);
 
-  // Efecto para cargar las fechas al inicio y cuando `actualizarCalendario` cambie
   useEffect(() => {
     fetchFechasNoDisponibles();
-  }, [habitacionId, actualizarCalendario]);
+  }, [habitacionId, actualizarCalendario, fetchFechasNoDisponibles]);
 
   const generarDiasMes = (mes) => {
     const inicioMes = startOfMonth(mes);
@@ -49,16 +45,13 @@ const CalendarioDoble = ({ habitacionId, onFechaSeleccionada, actualizarCalendar
 
   const handleDayClick = (dia) => {
     if (!fechaInicio || (fechaInicio && fechaFin)) {
-      // Si no hay fecha de inicio o ya hay un rango seleccionado, reinicia y selecciona una nueva fecha de inicio
       setFechaInicio(dia);
       setFechaFin(null);
       onFechaSeleccionada(dia, null);
     } else if (dia.getTime() === fechaInicio.getTime()) {
-      // Si se hace clic en la misma fecha, se trata de una reserva de un solo día
       setFechaFin(dia);
       onFechaSeleccionada(fechaInicio, dia);
     } else if (dia > fechaInicio) {
-      // Si se hace clic en una fecha posterior, establece la fecha final
       setFechaFin(dia);
       onFechaSeleccionada(fechaInicio, dia);
     }
@@ -68,9 +61,9 @@ const CalendarioDoble = ({ habitacionId, onFechaSeleccionada, actualizarCalendar
   const diasMesSiguiente = generarDiasMes(mesSiguiente);
 
   return (
-    <div className="container mt-4">
+    <div className="container-fluid mt-4">
       <div className="row">
-        <div className="col">
+        <div className="col-12 col-md-6 mb-3">
           <h5>{format(mesActual, 'MMMM yyyy')}</h5>
           <div className="d-flex flex-wrap">
             {diasMesActual.map((dia, index) => (
@@ -92,7 +85,7 @@ const CalendarioDoble = ({ habitacionId, onFechaSeleccionada, actualizarCalendar
           </div>
         </div>
 
-        <div className="col">
+        <div className="col-12 col-md-6 mb-3">
           <h5>{format(mesSiguiente, 'MMMM yyyy')}</h5>
           <div className="d-flex flex-wrap">
             {diasMesSiguiente.map((dia, index) => (

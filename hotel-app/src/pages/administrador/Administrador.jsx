@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Administrador = () => {
     const [isMobile, setIsMobile] = useState(false);
@@ -22,16 +22,6 @@ const Administrador = () => {
         }
     }, []);
 
-    const handleLinkClick = (e, path) => {
-        const isLoggedIn = localStorage.getItem('isAdmin');
-        if (isLoggedIn !== 'true') {
-            e.preventDefault();
-            navigate('/administración');
-        } else {
-            navigate(path);
-        }
-    };
-
     if (isMobile) {
         return (
             <div className="container mt-5">
@@ -44,30 +34,34 @@ const Administrador = () => {
     // Mostrar el panel solo si el usuario está autenticado
     return (
         <div className="container mt-5">
-            <h1 className="text-center">Panel de Administración</h1>
+
             <div className="card p-4 shadow-lg" style={{ maxWidth: '800px', margin: '0 auto' }}>
                 <h2 className="mb-4 text-center">Bienvenido Administrador</h2>
                 <p>Aquí puedes acceder a todas las funciones desarrolladas para la administración de tu negocio.</p>
-                <ul>
+                <ul className="list-unstyled">
                     <li>
-                        <a href="/admin/crearhabitacion" onClick={(e) => handleLinkClick(e, '/admin/crearhabitacion')}>
-                            Crear Habitación
-                        </a>
+                        <Link className="btn btn-outline-primary mb-2 w-100" to="/admin/crearhabitacion">Crear Habitación</Link>
                     </li>
                     <li>
-                        <a href="/admin/verhabitacion" onClick={(e) => handleLinkClick(e, '/admin/verhabitacion')}>
-                            Ver Habitaciones
-                        </a>
+                        <Link className="btn btn-outline-primary mb-2 w-100" to="/admin/verhabitacion">Ver Habitaciones</Link>
                     </li>
                     <li>
-                        <a href="/admin/crear-categoria" onClick={(e) => handleLinkClick(e, '/admin/crear-categoria')}>
-                            Crear Categoría
-                        </a>
+                        <Link className="btn btn-outline-primary mb-2 w-100" to="/admin/crear-categoria">Crear Categoría</Link>
                     </li>
                     <li>
-                        <a href="/admin/ver-categorias" onClick={(e) => handleLinkClick(e, '/admin/ver-categorias')}>
-                            Ver Categorías
-                        </a>
+                        <Link className="btn btn-outline-primary mb-2 w-100" to="/admin/ver-categorias">Ver Categorías</Link>
+                    </li>
+                    <li>
+                        <Link className="btn btn-outline-primary mb-2 w-100" to="/admin/crear-cuenta">Crear Cuenta</Link>
+                    </li>
+                    <li>
+                        <Link className="btn btn-outline-primary mb-2 w-100" to="/admin/listar-cuentas">Listar Cuentas</Link>
+                    </li>
+                    <li>
+                        <Link className="btn btn-outline-primary mb-2 w-100" to="/admin/crear-caracteristica">Crear Característica</Link>
+                    </li>
+                    <li>
+                        <Link className="btn btn-outline-primary mb-2 w-100" to="/admin/ver-caracteristicas">Listar Características</Link>
                     </li>
                 </ul>
                 <em>Nota: Esta página no es accesible desde dispositivos móviles.</em>

@@ -53,3 +53,45 @@
 .react-datepicker-popper {
   z-index: 1050 !important; /* Asegúrate de que el calendario esté por encima */
 }
+
+/* Ajuste de contenedores de la aplicación */
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+/* Media Queries para diferentes dispositivos */
+
+/* Estilo para pantallas medianas (tabletas) */
+@media (max-width: 768px) {
+  .App-header {
+      font-size: calc(12px + 2vmin);
+      padding: 10px;
+  }
+  
+
+  
+
+
+  @keyframes rotateIn {
+    from {
+      transform: rotateY(90deg);
+      opacity: 0;
+    }
+    to {
+      transform: rotateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .rotating-card {
+    animation: rotateIn 0.5s ease-out;
+  }
+  
+  }
