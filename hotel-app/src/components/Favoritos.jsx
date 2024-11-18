@@ -14,7 +14,7 @@ const Favoritos = () => {
         const fetchFavoritos = async () => {
             try {
                 const userId = localStorage.getItem('userId');
-                const response = await axios.get(`http://localhost:8080/favoritos/cuenta/${userId}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/favoritos/cuenta/${userId}`);
                 setFavoritos(response.data);
                 setLoading(false);
             } catch (error) {
@@ -31,7 +31,7 @@ const Favoritos = () => {
             try {
                 const opinionesMap = {};
                 for (let favorito of favoritos) {
-                    const response = await axios.get(`http://localhost:8080/opiniones/habitacion/${favorito.habitacion.id}`);
+                    const response = await axios.get(`${process.env.REACT_APP_API_URL}/opiniones/habitacion/${favorito.habitacion.id}`);
                     const data = response.data;
                     const promedioEstrellas = data.reduce((acc, opinion) => acc + opinion.estrellas, 0) / data.length || 0;
                     opinionesMap[favorito.habitacion.id] = {
@@ -57,12 +57,12 @@ const Favoritos = () => {
         try {
             if (esFavorito) {
                 setFavoritos(favoritos.filter(fav => fav.habitacion.id !== habitacionId));
-                await axios.delete('http://localhost:8080/favoritos', {
+                await axios.delete(`${process.env.REACT_APP_API_URL}/favoritos`, {
                     data: { cuentaId, habitacionId },
                     headers: { 'Content-Type': 'application/json' }
                 });
             } else {
-                const response = await axios.post(`http://localhost:8080/favoritos`, { cuentaId, habitacionId });
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/favoritos`, { cuentaId, habitacionId });
                 setFavoritos([...favoritos, response.data]);
             }
         } catch (error) {
@@ -98,37 +98,31 @@ const Favoritos = () => {
                     const { promedioEstrellas, cantidadOpiniones } = opinionesPorHabitacion[favorito.habitacion.id] || { promedioEstrellas: 0, cantidadOpiniones: 0 };
 
                     return (
-                        <div className="col-md-6 mb-4" key={favorito.habitacion.id}>
-                            <div className="card h-100" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', borderRadius: '15px', overflow: 'hidden' }}>
+                        <div className="col-12 col-sm-6 col-md-4 mb-4" key={favorito.habitacion.id}>
+                            <div className="card h-100" style={{ borderRadius: '15px', overflow: 'hidden' }}>
                                 {/* Contenedor de la imagen con altura fija */}
-                                <div
-                                    style={{
-                                        flex: '1 0 40%',
-                                        height: '250px', 
-                                        overflow: 'hidden',
-                                        position: 'relative' 
-                                    }}
-                                >
+                                <div style={{ position: 'relative', height: '250px', overflow: 'hidden' }}>
                                     <img
-                                        src={`http://localhost:8080/${favorito.habitacion.id}/${favorito.habitacion.imagenes[0].nombre}`}
+                                        src={`https://storage.googleapis.com/habitaciones/${favorito.habitacion.imagenes[0].url}`}
                                         alt={favorito.habitacion.nombre}
                                         className="img-fluid"
-                                        style={{ height: '100%', width: '100%', objectFit: 'cover' }}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     />
                                 </div>
 
                                 {/* Contenido de la tarjeta */}
-
-                                <div className="card-body" style={{ flex: '1 0 60%', padding: '15px', overflow: 'hidden', height: '250px' }}>
-                                    <h5 className="card-title">{favorito.habitacion.nombre}</h5>
-                                    <p className="card-text" style={{ maxHeight: '60px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{favorito.habitacion.descripcion}</p>
+                                <div className="card-body d-flex flex-column justify-content-between">
+                                    <h5 className="card-title text-truncate">{favorito.habitacion.nombre}</h5>
+                                    <p className="card-text text-truncate" style={{ maxHeight: '60px' }}>
+                                        {favorito.habitacion.descripcion}
+                                    </p>
 
                                     <div className="d-flex justify-content-start align-items-center mb-3">
-                                        <span className="badge" style={{ fontSize: '1.2rem', marginRight: '0.5rem', backgroundColor: '#28a745', color: '#fff', padding: '5px 10px' }}>
+                                        <span className="badge bg-success" style={{ fontSize: '1.2rem', marginRight: '0.5rem', borderRadius: '5px' }}>
                                             {promedioEstrellas}
                                         </span>
                                         <div className="d-flex flex-column ms-2">
-                                            <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#6C757D' }}>
+                                        <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#6C757D' }}>
                                                 {promedioEstrellas >= 4 ? 'Excelente' : 'Buena'}
                                             </span>
                                             <span className="text-muted">
@@ -137,15 +131,15 @@ const Favoritos = () => {
                                         </div>
                                     </div>
 
-                                    <button onClick={() => toggleFavorito(favorito.habitacion.id)} className="btn" style={{ position: 'absolute', top: '10px', right: '10px', background: 'transparent' }}>
+                                    <button onClick={() => toggleFavorito(favorito.habitacion.id)} className="btn p-0" style={{ position: 'absolute', top: '10px', right: '10px', background: 'transparent' }}>
                                         <i className="fa" style={{ color: esFavorito(favorito.habitacion.id) ? 'red' : 'grey', fontSize: '24px' }}>❤</i>
                                     </button>
 
-                                    <div className="d-flex justify-content-between align-items-end">
+                                    <div className="d-flex justify-content-between align-items-end mt-3">
                                         <strong style={{ fontSize: '1.4rem', color: '#333' }}>
-                                            USD {favorito.habitacion.precio}
+                                            USD {favorito.habitacion.precio.toLocaleString()}
                                         </strong>
-                                        <a href={`/habitaciones/${favorito.habitacion.id}`} className="btn btn-primary" style={{ borderRadius: '10px', padding: '5px 15px' }}>
+                                        <a href={`/habitaciones/${favorito.habitacion.id}`} className="btn btn-primary btn-sm">
                                             Ver detalles
                                         </a>
                                     </div>
@@ -164,6 +158,8 @@ const Favoritos = () => {
                 </Pagination>
             </div>
         </div>
+
+
     );
 };
 

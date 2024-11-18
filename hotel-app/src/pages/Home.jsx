@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import Select from 'react-select'; // Importa react-select
+import Select from 'react-select';
 import HabitacionesDisponibles from '../components/HabitacionesDisponibles';
 
 const Home = () => {
@@ -24,7 +24,7 @@ const Home = () => {
   useEffect(() => {
     const fetchCiudades = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/ciudades');
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/ciudades`);
         setCiudades(response.data);
       } catch (error) {
         console.error("Error al obtener las ciudades", error);
@@ -33,7 +33,7 @@ const Home = () => {
 
     const fetchCategorias = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/categorias');
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/categorias`);
         const opciones = response.data.map((categoria) => ({
           value: categoria.id,
           label: categoria.nombre,
@@ -44,40 +44,33 @@ const Home = () => {
       }
     };
 
-    const fetchHabitaciones = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/habitaciones');
-        const data = await response.json();
-        setResultadosFiltrados(data);
-      } catch (error) {
-        console.log('Error al cargar habitaciones:', error);
-      }
-    };
-
     fetchCiudades();
     fetchCategorias();
-    fetchHabitaciones();
   }, []);
 
   const handleSearch = async (e) => {
     e.preventDefault();
     try {
-      const categoriasString = categoriasSeleccionadas.map((cat) => cat.value).join(','); // Convertir las categorías seleccionadas en un string separado por comas
-      const response = await axios.get(`http://localhost:8080/habitaciones/filtrar`, {
-        params: {
-          destino: ciudadSeleccionada,
-          fechaLlegada: startDate ? startDate.toISOString().split('T')[0] : null,
-          fechaSalida: endDate ? endDate.toISOString().split('T')[0] : null,
-          adultos: guests.adults,
-          ninos: guests.children,
-          categoria: categoriasString,
-        },
-      });
-      setResultadosFiltrados(response.data);
+        const categoriasString = categoriasSeleccionadas.map((cat) => cat.value).join(',');
+
+        // Realiza la solicitud de filtrado de habitaciones
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/habitaciones/filtrar`, {
+            params: {
+                destino: ciudadSeleccionada,
+                fechaLlegada: startDate ? startDate.toISOString().split('T')[0] : null,
+                fechaSalida: endDate ? endDate.toISOString().split('T')[0] : null,
+                adultos: guests.adults,
+                ninos: guests.children,
+                categoria: categoriasString || null,
+            },
+        });
+
+        // Asegúrate de manejar correctamente la respuesta
+        setResultadosFiltrados(response.data);
     } catch (error) {
-      console.error('Error al realizar la búsqueda:', error);
+        console.error('Error al realizar la búsqueda:', error);
     }
-  };
+};
 
   const handleGuestChange = (type, action) => {
     setGuests((prev) => ({

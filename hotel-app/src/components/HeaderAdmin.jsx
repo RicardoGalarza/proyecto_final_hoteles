@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-
+import { Link, useNavigate } from 'react-router-dom';
 const HeaderAdmin = () => {
   const navigate = useNavigate();
   const [permissions, setPermissions] = useState([]);
@@ -15,7 +14,7 @@ const HeaderAdmin = () => {
       if (userId) {
         try {
           // Hacer la solicitud a la API para obtener los datos del admin
-          const response = await fetch(`http://localhost:8080/cuentas/${userId}`, {
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/cuentas/${userId}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -80,7 +79,9 @@ const HeaderAdmin = () => {
   return (
     <header className="bg-dark text-white py-3">
       <div className="container d-flex justify-content-between align-items-center">
-        <h1>Admin</h1>
+      <h1>
+                <Link to="/administracion" style={{ color: 'inherit', textDecoration: 'none' }}>Admin</Link>
+            </h1>
 
         <nav className="d-flex">
         {/* Botones de Cuentas */}

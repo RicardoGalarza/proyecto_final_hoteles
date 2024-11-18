@@ -1,123 +1,132 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Pagination } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
-const HabitacionesDisponibles = ({ habitacionesFiltradas }) => {
+const HabitacionesDisponibles = ({ habitacionesFiltradas = [] }) => {
     const [habitaciones, setHabitaciones] = useState([]);
-    const [categorias, setCategorias] = useState([]);
     const [habitacionesMostradas, setHabitacionesMostradas] = useState([]);
-    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
+    const [rotatedHabitaciones, setRotatedHabitaciones] = useState([]);
     const [opinionesPorHabitacion, setOpinionesPorHabitacion] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
     const habitacionesPorPagina = 10;
     const [favoritos, setFavoritos] = useState([]);
-    const navigate = useNavigate();
-
     const [terminoBusqueda, setTerminoBusqueda] = useState('');
     const [sugerencias, setSugerencias] = useState([]);
+    const navigate = useNavigate();
+
+    const fetchHabitaciones = useCallback(async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/habitaciones`);
+            setHabitaciones(response.data);
+            setHabitacionesMostradas(response.data);
+            setRotatedHabitaciones(shuffleArray(response.data)); // Mezcla aleatoria al cargar
+            fetchOpinionesPorHabitacion(response.data);
+        } catch (error) {
+            console.error('Error al cargar habitaciones:', error);
+        }
+    }, []);
 
     useEffect(() => {
-        const fetchHabitaciones = async () => {
-            try {
-                const response = await axios.get('http://localhost:8080/habitaciones');
-                const data = response.data;
-                setHabitaciones(data);
-                fetchOpinionesPorHabitacion(data); // Cargar opiniones después de obtener habitaciones
-            } catch (error) {
-                console.log('Error al cargar habitaciones:', error);
-            }
-        };
-
-        const fetchCategorias = async () => {
-            try {
-                const response = await axios.get('http://localhost:8080/categorias');
-                const data = response.data;
-                setCategorias(data);
-            } catch (error) {
-                console.log('Error al cargar categorías:', error);
-            }
-        };
-
-        const fetchFavoritos = async () => {
-            try {
-                const cuentaId = JSON.parse(localStorage.getItem('userId'));
-                const response = await axios.get(`http://localhost:8080/favoritos/cuenta/${cuentaId}`);
-                setFavoritos(response.data);
-            } catch (error) {
-                console.log('Error al cargar favoritos:', error);
-            }
-        };
-
-        const habitacionesFiltradasPorCategoria = categoriaSeleccionada
-            ? habitacionesFiltradas.filter(hab => hab.categoria === categoriaSeleccionada)
-            : habitacionesFiltradas;
-
-        setHabitacionesMostradas(habitacionesFiltradasPorCategoria);
-
-        fetchHabitaciones();
-        fetchCategorias();
+        if (habitacionesFiltradas.length > 0) {
+            setHabitaciones(habitacionesFiltradas);
+            setHabitacionesMostradas(habitacionesFiltradas);
+            setRotatedHabitaciones(shuffleArray(habitacionesFiltradas)); // Mezcla aleatoria
+        } else {
+            fetchHabitaciones();
+        }
         fetchFavoritos();
-    }, [categoriaSeleccionada, habitacionesFiltradas]);
+    }, [habitacionesFiltradas, fetchHabitaciones]);
 
-    // Función mejorada para cargar opiniones y calcular el promedio de estrellas
+    // Función para mezclar el array de manera aleatoria
+    const shuffleArray = (array) => {
+        return array.sort(() => Math.random() - 0.5);
+    };
+
+    const fetchFavoritos = async () => {
+        try {
+            const cuentaId = JSON.parse(localStorage.getItem('userId'));
+            if (cuentaId) {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/favoritos/cuenta/${cuentaId}`);
+                setFavoritos(response.data);
+            }
+        } catch (error) {
+            console.error('Error al cargar favoritos:', error);
+        }
+    };
+
     const fetchOpinionesPorHabitacion = async (habitaciones) => {
         try {
             const opinionesData = {};
             for (const habitacion of habitaciones) {
-                const response = await axios.get(`http://localhost:8080/opiniones/habitacion/${habitacion.id}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/opiniones/habitacion/${habitacion.id}`);
                 const opiniones = response.data;
-
                 const totalEstrellas = opiniones.reduce((sum, opinion) => sum + opinion.estrellas, 0);
                 const promedioEstrellas = opiniones.length ? (totalEstrellas / opiniones.length).toFixed(1) : '0';
                 opinionesData[habitacion.id] = {
                     promedioEstrellas,
-                    cantidadOpiniones: opiniones.length
+                    cantidadOpiniones: opiniones.length,
                 };
             }
             setOpinionesPorHabitacion(opinionesData);
         } catch (error) {
-            console.log('Error al cargar opiniones:', error);
+            console.error('Error al cargar opiniones:', error);
         }
     };
 
-    const formatearMiles = (numero) => {
-        return numero.toLocaleString('es-ES');
-    };
-
     const handleBusquedaChange = async (e) => {
-        const termino = e.target.value;
+        const termino = e.target.value.trim();
         setTerminoBusqueda(termino);
 
-        if (termino.length >= 3) {
+        if (termino.length > 0) {
             try {
-                const response = await axios.get(`http://localhost:8080/habitaciones/buscar?busqueda=${termino}`);
-                setSugerencias(response.data);
-                setHabitacionesMostradas(response.data);
+                const ciudadResponse = await axios.get(`${process.env.REACT_APP_API_URL}/ciudades?nombre=${termino}`);
+                if (ciudadResponse.data && ciudadResponse.data.length > 0) {
+                    const ciudadId = ciudadResponse.data[0].id;
+                    const habitacionesPorCiudad = await axios.get(`${process.env.REACT_APP_API_URL}/habitaciones/ciudad/${ciudadId}`);
+                    setHabitacionesMostradas(habitacionesPorCiudad.data);
+                    setRotatedHabitaciones(habitacionesPorCiudad.data);
+                    setSugerencias(habitacionesPorCiudad.data);
+                } else {
+                    const response = await axios.get(`${process.env.REACT_APP_API_URL}/habitaciones/buscar?busqueda=${termino}`);
+                    if (response.data && response.data.length > 0) {
+                        setHabitacionesMostradas(response.data);
+                        setRotatedHabitaciones(response.data);
+                        setSugerencias(response.data);
+                    } else {
+                        setHabitacionesMostradas([]);
+                        setRotatedHabitaciones([]);
+                        setSugerencias([]);
+                    }
+                }
             } catch (error) {
-                console.log('Error al buscar habitaciones:', error);
+                console.error('Error al buscar habitaciones:', error);
+                setHabitacionesMostradas([]);
+                setRotatedHabitaciones([]);
+                setSugerencias([]);
             }
         } else {
+            setHabitacionesMostradas(habitaciones);
+            setRotatedHabitaciones(habitaciones);
             setSugerencias([]);
-            setHabitacionesMostradas(habitacionesFiltradas);
         }
     };
 
     const handleSugerenciaClick = (habitacion) => {
         setTerminoBusqueda(habitacion.nombre);
         setHabitacionesMostradas([habitacion]);
+        setRotatedHabitaciones([habitacion]);
         setSugerencias([]);
     };
-
-    const indexOfLastHabitacion = currentPage * habitacionesPorPagina;
-    const indexOfFirstHabitacion = indexOfLastHabitacion - habitacionesPorPagina;
-    const habitacionesActuales = habitacionesFiltradas.slice(indexOfFirstHabitacion, indexOfLastHabitacion);
 
     const paginacion = (numeroPagina) => {
         setCurrentPage(numeroPagina);
     };
 
-    const totalPaginas = Math.ceil(habitacionesFiltradas.length / habitacionesPorPagina);
+    const totalPaginas = Math.ceil(habitacionesMostradas.length / habitacionesPorPagina);
+    const indexOfLastHabitacion = currentPage * habitacionesPorPagina;
+    const indexOfFirstHabitacion = indexOfLastHabitacion - habitacionesPorPagina;
+    const habitacionesPaginadas = rotatedHabitaciones.slice(indexOfFirstHabitacion, indexOfLastHabitacion);
 
     const toggleFavorito = async (habitacionId) => {
         const cuentaId = parseInt(localStorage.getItem('userId'), 10);
@@ -128,18 +137,18 @@ const HabitacionesDisponibles = ({ habitacionesFiltradas }) => {
                 navigate('/login');
             } else {
                 if (esFavorito) {
-                    await axios.delete('http://localhost:8080/favoritos', {
+                    await axios.delete(`${process.env.REACT_APP_API_URL}/favoritos`, {
                         data: { cuentaId, habitacionId },
-                        headers: { 'Content-Type': 'application/json' }
+                        headers: { 'Content-Type': 'application/json' },
                     });
                     setFavoritos(favoritos.filter(fav => fav.habitacion.id !== habitacionId));
                 } else {
-                    const response = await axios.post('http://localhost:8080/favoritos', { cuentaId, habitacionId });
+                    const response = await axios.post(`${process.env.REACT_APP_API_URL}/favoritos`, { cuentaId, habitacionId });
                     setFavoritos([...favoritos, response.data]);
                 }
             }
         } catch (error) {
-            console.log('Error al actualizar el estado del favorito:', error);
+            console.error('Error al actualizar el estado del favorito:', error);
         }
     };
 
@@ -160,7 +169,6 @@ const HabitacionesDisponibles = ({ habitacionesFiltradas }) => {
                         value={terminoBusqueda}
                         onChange={handleBusquedaChange}
                         aria-haspopup="true"
-                        aria-expanded={sugerencias.length > 0}
                     />
                     {sugerencias.length > 0 && (
                         <ul
@@ -187,20 +195,23 @@ const HabitacionesDisponibles = ({ habitacionesFiltradas }) => {
                 </div>
             </div>
 
-            {habitacionesMostradas.length > 0 ? (
-                <div className="row">
-                    {habitacionesMostradas.map((habitacion) => {
+            {habitacionesPaginadas.length > 0 ? (
+                <div className="row row-cols-1 row-cols-md-2 row-cols-lg-2 g-4">
+                    {habitacionesPaginadas.map((habitacion) => {
+                        if (!habitacion || !habitacion.imagenes || habitacion.imagenes.length === 0) {
+                            return null;
+                        }
                         const { promedioEstrellas, cantidadOpiniones } = opinionesPorHabitacion[habitacion.id] || { promedioEstrellas: '0', cantidadOpiniones: 0 };
 
                         return (
-                            <div className="col-md-6 mb-4" key={habitacion.id}>
-                                <div className="card h-100" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', borderRadius: '15px', overflow: 'hidden', width: '100%' }}>
-                                    <div style={{ flex: '1 0 40%', height: '250px', overflow: 'hidden' }}>
+                            <div className="col mb-4" key={habitacion.id}>
+                                <div className="card h-100" style={{ borderRadius: '15px', overflow: 'hidden' }}>
+                                    <div style={{ height: '250px', overflow: 'hidden' }}>
                                         <img
-                                            src={`http://localhost:8080/${habitacion.id}/${habitacion.imagenes[0].nombre}`}
+                                            src={`https://storage.googleapis.com/habitaciones/${habitacion.imagenes[0].url}`}
                                             alt={habitacion.nombre}
-                                            className="img-fluid"
-                                            style={{ height: '100%', width: '100%', objectFit: 'cover' }}
+                                            className="img-fluid w-100"
+                                            style={{ objectFit: 'cover', height: '100%' }}
                                         />
                                         <button
                                             onClick={() => toggleFavorito(habitacion.id)}
@@ -213,7 +224,7 @@ const HabitacionesDisponibles = ({ habitacionesFiltradas }) => {
                                         </button>
                                     </div>
 
-                                    <div className="card-body" style={{ flex: '1 0 60%', padding: '15px', overflow: 'hidden', height: '250px' }}>
+                                    <div className="card-body" style={{ padding: '15px' }}>
                                         <h5 className="card-title">{habitacion.nombre}</h5>
                                         <p className="card-text" style={{ maxHeight: '60px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{habitacion.descripcion}</p>
                                         <div className="d-flex justify-content-start align-items-center mb-3">
@@ -231,7 +242,7 @@ const HabitacionesDisponibles = ({ habitacionesFiltradas }) => {
                                         </div>
                                         <div className="d-flex justify-content-between align-items-end">
                                             <strong style={{ fontSize: '1.4rem', color: '#333' }}>
-                                                ${formatearMiles(habitacion.precio)} CLP
+                                                ${habitacion.precio.toLocaleString('es-ES')} CLP
                                             </strong>
                                             <a href={`/habitaciones/${habitacion.id}`} className="btn btn-primary" style={{ borderRadius: '10px', padding: '5px 15px' }}>
                                                 Ver Detalles
@@ -265,5 +276,4 @@ const HabitacionesDisponibles = ({ habitacionesFiltradas }) => {
         </div>
     );
 };
-
 export default HabitacionesDisponibles;

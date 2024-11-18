@@ -1,20 +1,20 @@
 // src/components/LoginAdmin.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const ClienteLogin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+
   const [errorMessage, setErrorMessage] = useState('');
 
   // Ejemplo de login en React
   const handleLogin = async (e) => {
     e.preventDefault();
+    
 
     try {
       // Llamada al endpoint de autenticación (primer endpoint)
-      const response = await fetch('http://localhost:8080/cuentas/login', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/cuentas/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -28,6 +28,7 @@ const ClienteLogin = () => {
       if (!response.ok) {
         // Verificar el estado de la respuesta para manejar diferentes errores
         const errorData = await response.json();
+        console.error('Detalles del error:', errorData);
         setErrorMessage(errorData.message || 'Su correo y/o contraseña no son correctas');
         return; // Terminar ejecución si hay un error
       }
@@ -42,15 +43,16 @@ const ClienteLogin = () => {
       localStorage.setItem('userId', data.userId);
     
       // Llamada para obtener los permisos del usuario
-      const userResponse = await fetch(`http://localhost:8080/cuentas/${data.userId}`, {
+      const userResponse = await fetch(`${process.env.REACT_APP_API_URL}/cuentas/${data.userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
+      
     
       if (!userResponse.ok) {
-        const userError = await userResponse.json();
+        //const userError = await userResponse.json();
         setErrorMessage('Error al obtener los permisos del usuario');
         return;
       }
@@ -63,9 +65,9 @@ const ClienteLogin = () => {
       // Redirigir a la página principal o dashboard
 
       
-      if(userData.rol.id == 1){
-        window.location.href = '/administracion';
-      }else{
+      if (userData.rol.id === 1) {
+        window.location.href = '/administracion'; // Asignación correcta para redirigir
+      } else {
         window.location.href = '/';
       }
 
